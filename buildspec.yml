@@ -5,10 +5,13 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
-      - echo "Installing dependencies..."
-      - pip install ansible ansible-runner boto3 botocore
+      - echo "Installing required tools..."
+      - pip install ansible ansible-runner boto3 botocore jq
   pre_build:
     commands:
+      - echo "Retrieving AWS credentials from Secrets Manager..."
+      - export AWS_ACCESS_KEY_ID=$(aws secretsmanager get-secret-value --secret-id aws/credentials --query SecretString --output text | jq -r '.AWS_ACCESS_KEY_ID')
+      - export AWS_SECRET_ACCESS_KEY=$(aws secretsmanager get-secret-value --secret-id aws/credentials --query SecretString --output text | jq -r '.AWS_SECRET_ACCESS_KEY')
       - echo "Initializing Terraform..."
       - cd terraform
       - terraform init
@@ -18,3 +21,10 @@ phases:
       - terraform plan -out=tfplan
       - echo "Applying Terraform deployment..."
       - terraform apply -auto-approve tfplan
+      - echo "Running Ansible playbook..."
+      - cd ../ansible
+      - ansible-playbook -i inventory.ini playbook.yml
+artifacts:
+  files:
+    - '**/*'
+
