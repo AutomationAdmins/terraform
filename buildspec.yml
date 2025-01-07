@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Installing dependencies..."
+      - pip install ansible ansible-runner boto3 botocore
+  pre_build:
+    commands:
+      - echo "Initializing Terraform..."
+      - cd terraform
+      - terraform init
+  build:
+    commands:
+      - echo "Planning Terraform deployment..."
+      - terraform plan -out=tfplan
+      - echo "Applying Terraform deployment..."
+      - terraform apply -auto-approve tfplan
