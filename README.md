@@ -1,2 +1,3 @@
 # terraform
 checking out
+verifying
