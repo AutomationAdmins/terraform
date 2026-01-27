@@ -41,6 +41,7 @@ jobs:
 
       # 5️⃣ Terraform Init (connects to backend)
       - name: Terraform Init
+        working-directory: terraform
         run: terraform init
 
       # 6️⃣ Terraform Plan (safe preview)
