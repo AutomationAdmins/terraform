@@ -2,7 +2,7 @@ name: Terraform GCP
 
 # Trigger pipeline on push to main branch or manual run
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger
 
 jobs:
   terraform:
