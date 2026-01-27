@@ -1,0 +1,44 @@
+name: Terraform Plan CI
+
+on:
+  pull_request:
+    branches:
+      - automation   # PR to automation triggers this
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: Projects   # change if needed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.3
+
+      # Authenticate to GCP using Service Account JSON
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Terraform Init
+        run: terraform init -reconfigure
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
