@@ -1,0 +1,42 @@
+name: Terraform GCP
+
+# Trigger pipeline on push to main branch or manual run
+on:
+  push:
+    branches: [ "automation" ]
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      # 1️⃣ Checkout repo code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Authenticate to GCP using Service Account JSON
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 3️⃣ Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 4️⃣ Terraform Init (connects to backend)
+      - name: Terraform Init
+        run: terraform init
+
+      # 5️⃣ Terraform Plan (shows changes)
+      - name: Terraform Plan
+        run: terraform plan
+
+      # 6️⃣ Terraform Apply (creates infra)
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
