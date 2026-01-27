@@ -29,10 +29,10 @@ jobs:
 
       # 4️⃣ Terraform Init (connects to backend)
       - name: Terraform Init
-        working-directory: projects
+        working-directory: ./projects
         run: terraform init
 
       # 5️⃣ Terraform Plan (shows changes)
       - name: Terraform Plan
-        working-directory: projects
+        working-directory: ./projects
         run: terraform plan
