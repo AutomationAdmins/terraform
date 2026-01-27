@@ -26,7 +26,7 @@ jobs:
       # For now we skip backend auth issues
 
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init -reconfigure
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
