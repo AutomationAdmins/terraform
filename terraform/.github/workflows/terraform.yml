@@ -2,8 +2,6 @@ name: Terraform GCP
 
 # Trigger pipeline on push to main branch or manual run
 on:
-  push:
-    branches: [ "automation" ]
   workflow_dispatch:
 
 jobs:
