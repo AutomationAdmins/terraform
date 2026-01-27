@@ -9,6 +9,9 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: Projects   # change if needed
@@ -22,8 +25,11 @@ jobs:
         with:
           terraform_version: 1.14.3
 
-      # Auth will be added later (OIDC or SA key)
-      # For now we skip backend auth issues
+      # Authenticate to GCP using Service Account JSON
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Terraform Init
         run: terraform init -reconfigure
