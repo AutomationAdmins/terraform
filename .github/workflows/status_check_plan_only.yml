@@ -1,4 +1,4 @@
-name: Terraform Plan CI
+name: Terraform dry run
 
 on:
   pull_request:
