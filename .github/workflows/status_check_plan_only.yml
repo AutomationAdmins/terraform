@@ -1,16 +1,19 @@
-name: Terraform Plan CI
+name: Terraform dry run
 
 on:
-  pull_request:
-    branches:
-      - automation   # PR to automation triggers this
+  issue_comment:
+    types: [created]
 
 jobs:
   terraform:
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/plan')
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
+      pull-requests: write
+      issues: write
       id-token: write
     defaults:
       run:
@@ -31,6 +34,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Setup Infracost #For cost estimation
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
       - name: Terraform Init
         run: terraform init -reconfigure
 
@@ -41,4 +49,37 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -no-color
+        run: terraform plan -out=tfplan
+      
+      - name: Convert plan to human-readable json format
+        run: terraform show -json tfplan > tfplan.json
+      
+      - name: Terraform Plan Summary
+        run: |
+          echo "## Terraform Plan Summary" > summary.md
+          echo "" >> summary.md
+          terraform show -no-color tfplan >> summary.md
+
+      - name: Infracost Breakdown
+        working-directory: Projects
+        run: |
+          infracost breakdown --path infracost.json --format json --out-file infracost.json
+
+      - name: Infracost Comment
+        uses: infracost/actions/comment@v1.1.2
+        with:
+          path: Projects/infracost.json
+          behavior: update
+
+      - name: Comment Plan on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('Projects/summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary.substring(0, 65000)
+            });
