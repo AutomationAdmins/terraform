@@ -62,7 +62,7 @@ jobs:
       - name: Infracost Breakdown
         working-directory: Projects
         run: |
-          infracost breakdown --path . --format json --out-file Projects/infracost.json
+          infracost breakdown --path Projects --format json --out-file Projects/infracost.json
 
       - name: Infracost Comment
         uses: infracost/actions/comment@v1.1.2
