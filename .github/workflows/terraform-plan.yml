@@ -1,4 +1,4 @@
-name: Terraform Plan (Label Triggered)
+name: Terraform Plan #(Label Triggered)
 
 on:
   pull_request:
