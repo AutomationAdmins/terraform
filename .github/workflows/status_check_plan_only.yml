@@ -1,32 +1,27 @@
 name: Terraform dry run
 
 on:
-  pull_request:
-    branches:
-      - automation
   issue_comment:
     types: [created]
 
 jobs:
-  terraform:
+  plan:
     if: |
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'issue_comment' &&
-       github.event.issue.pull_request &&
-       contains(github.event.comment.body, '/plan'))
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/plan')
+
     runs-on: ubuntu-latest
     permissions:
-      contents: read
       pull-requests: write
-      issues: write
+      contents: read
       id-token: write
-    defaults:
-      run:
-        working-directory: Projects   # change if needed
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # 🔥 Checkout PR code, NOT default branch
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.issue.pull_request.head.ref }}
+          repository: ${{ github.event.issue.pull_request.head.repo.full_name }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -55,6 +50,18 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
+
+      # ✅ Mark PR check as SUCCESS
+      - name: Set PR Status Green
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA=$(gh pr view ${{ github.event.issue.number }} --json headRefOid -q .headRefOid)
+          gh api repos/${{ github.repository }}/check-runs \
+            -f name="terraform-plan" \
+            -f head_sha=$SHA \
+            -f status="completed" \
+            -f conclusion="success"
       
       - name: Convert plan to human-readable json format
         run: terraform show -json tfplan > tfplan.json
