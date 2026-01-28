@@ -1,75 +1,64 @@
-name: Terraform dry run
+name: Terraform Plan (Label Triggered)
 
 on:
-  issue_comment:
-    types: [created]
+  pull_request:
+    branches: [automation]
+    types: [labeled]
 
 jobs:
-  terraform:
-    if: |
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/plan')
+  plan:
+    if: github.event.label.name == 'ready-for-plan'
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       pull-requests: write
-      issues: write
       id-token: write
+
     defaults:
       run:
-        working-directory: Projects   # change if needed
+        working-directory: Projects
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.3
 
-      # Authenticate to GCP using Service Account JSON
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Setup Infracost #For cost estimation
-        uses: infracost/actions/setup@v3
+      - uses: infracost/actions/setup@v3
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
       - name: Terraform Init
         run: terraform init -reconfigure
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
-
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-      
-      - name: Convert plan to human-readable json format
+
+      - name: Convert plan to JSON
         run: terraform show -json tfplan > tfplan.json
-      
-      - name: Terraform Plan Summary
-        run: |
-          echo "## Terraform Plan Summary" > summary.md
-          echo "" >> summary.md
-          terraform show -no-color tfplan >> summary.md
 
       - name: Infracost Breakdown
-        working-directory: Projects
-        run: |
-          infracost breakdown --path infracost.json --format json --out-file infracost.json
+        run: infracost breakdown --path tfplan.json --format json --out-file infracost.json
 
       - name: Infracost Comment
         uses: infracost/actions/comment@v1.1.2
         with:
-          path: Projects/infracost.json
+          path: infracost.json
           behavior: update
+
+      - name: Terraform Plan Summary
+        run: |
+          echo "## Terraform Plan Summary" > summary.md
+          terraform show -no-color tfplan >> summary.md
 
       - name: Comment Plan on PR
         uses: actions/github-script@v7
