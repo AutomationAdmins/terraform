@@ -5,46 +5,40 @@ on:
   workflow_dispatch: # Manual trigger
 
 jobs:
-  terraform-apply:
+  terraform:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       id-token: write
 
-    steps:
-      # 1️⃣ Checkout repo code
-      - name: Checkout code
-        uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: Projects
 
-      # 2️⃣ Authenticate to GCP using Service Account JSON
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 3️⃣ Install Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Debug workspace
-        run: |
-          echo "PWD:"
-          pwd
-          echo "List files:"
-          ls -R
-
-      # 4️⃣ Terraform Init (connects to backend)
       - name: Terraform Init
-        working-directory: Projects
-        run: terraform init
+        run: terraform init -reconfigure
 
-      # 5️⃣ Terraform Plan (shows changes)
       - name: Terraform Plan
-        working-directory: Projects
-        run: terraform plan
+        run: terraform plan -out=tfplan
 
-        # 6️⃣ Terraform Apply (applies changes)
       - name: Terraform Apply
-        working-directory: Projects
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
+
+      - name: Convert plan to JSON
+        run: terraform show -json tfplan > tfplan.json
+
+      - name: Upload Terraform Artifacts to GCS
+        run: |
+          RUN_ID=${{ github.run_id }}
+          gsutil cp tfplan gs://${{ secrets.TF_ARTIFACT_BUCKET }}/plans/$RUN_ID/
+          gsutil cp tfplan.json gs://${{ secrets.TF_ARTIFACT_BUCKET }}/plans/$RUN_ID/
