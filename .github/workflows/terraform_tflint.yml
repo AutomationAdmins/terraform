@@ -1,0 +1,29 @@
+name: Terraform TFLint
+
+on:
+  pull_request:
+    branches: [automation]
+
+jobs:
+  tflint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Projects
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Run TFLint (Soft Mode)
+        run: |
+          tflint --init
+          tflint || true
