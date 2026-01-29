@@ -1,11 +1,11 @@
-name: Terraform GCP
+name: Terraform apply
 
 # Trigger pipeline on push to main branch or manual run
 on:
   workflow_dispatch: # Manual trigger
 
 jobs:
-  terraform:
+  terraform-apply:
     runs-on: ubuntu-latest
 
     permissions:
@@ -43,3 +43,8 @@ jobs:
       - name: Terraform Plan
         working-directory: Projects
         run: terraform plan
+
+        # 6️⃣ Terraform Apply (applies changes)
+      - name: Terraform Apply
+        working-directory: Projects
+        run: terraform apply -auto-approve
