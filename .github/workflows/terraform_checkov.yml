@@ -1,0 +1,26 @@
+name: Terraform Security Scan (Checkov - Warning Only)
+
+on:
+  pull_request:
+    branches: [automation]
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov (Warning Only)
+        run: |
+          checkov -d Projects --soft-fail
+            echo "Checkov scan completed with warnings only."
