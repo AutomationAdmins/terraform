@@ -1,4 +1,4 @@
-name: Terraform Security Scan # Checkov
+name: Terraform Security Scan (Checkov Hybrid)
 
 on:
   pull_request:
@@ -7,9 +7,6 @@ on:
 jobs:
   checkov:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: Projects
 
     steps:
       - name: Checkout code
@@ -23,8 +20,12 @@ jobs:
       - name: Install Checkov
         run: pip install checkov
 
-      - name: Run Checkov (Soft Governance)
+      # 1️⃣ Soft governance - report everything but DO NOT fail
+      - name: Checkov Soft Governance
         run: |
-          checkov -d . \
-            --quiet \
-            --soft-fail
+          checkov -d Projects --soft-fail
+
+      # 2️⃣ Enforce ONLY public bucket policy (CKV_GCP_114)
+      - name: Enforce Public Access Prevention on Buckets
+        run: |
+          checkov -d Projects -c CKV_GCP_114
