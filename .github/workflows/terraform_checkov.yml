@@ -25,10 +25,10 @@ jobs:
 
       - name: Run Checkov (Soft Mode)
         run: |
-          checkov -d . --config-file .checkov.yaml --soft-fail
+          checkov -d . --config-file .checkov.yml --soft-fail
 
       - name: Run Checkov (Enforce Critical)
         run: |
           checkov -d . \
-            --config-file .checkov.yaml \
+            --config-file .checkov.yml \
             --hard-fail-on CKV_GCP_1,CKV_GCP_2
