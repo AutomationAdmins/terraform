@@ -23,6 +23,11 @@ jobs:
       - name: Install Checkov
         run: pip install checkov
 
+      - name: Upgrade Checkov
+        run: |
+        pip install --upgrade pip
+        pip install --upgrade checkov
+
       - name: Run Checkov (Soft Mode)
         run: |
           checkov -d . --config-file .checkov.yml --soft-fail
