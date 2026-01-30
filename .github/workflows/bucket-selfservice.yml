@@ -1,0 +1,65 @@
+name: Bucket Self Service Bot
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  bucket:
+    if: contains(github.event.issue.labels.*.name, 'infra-request')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+
+      - name: Parse Issue
+        id: issue
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/request-bucket.yml
+
+      - name: Generate Terraform File
+        run: |
+          BUCKET=${{ steps.issue.outputs.bucket_name }}
+          REGION=${{ steps.issue.outputs.region }}
+          ENV=${{ steps.issue.outputs.environment }}
+          PUBLIC=${{ steps.issue.outputs.public_access }}
+
+          mkdir -p Projects/buckets
+          cat <<EOF > Projects/buckets/${BUCKET}.tf
+          resource "google_storage_bucket" "${BUCKET}" {
+            name     = "${BUCKET}"
+            location = "${REGION}"
+
+            uniform_bucket_level_access = true
+            public_access_prevention    = "enforced"
+
+            labels = {
+              env = "${ENV}"
+              owner = "selfservice"
+            }
+          }
+          EOF
+
+      - name: Commit Code
+        run: |
+          git config user.name "infra-bot"
+          git config user.email "infra-bot@company.com"
+          git add .
+          git commit -m "Auto: bucket ${BUCKET}"
+          git push origin staging
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: automation
+          branch: bucket-${{ github.run_id }}
+          title: "Self-service bucket: ${{ steps.issue.outputs.bucket_name }}"
+          labels: ready-for-plan
