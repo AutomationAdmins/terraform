@@ -1,0 +1,42 @@
+name: Request GCS Bucket
+description: Self-service GCS bucket request
+title: "[Bucket Request]: "
+labels: ["infra-request"]
+body:
+  - type: input
+    id: bucket_name
+    attributes:
+      label: Bucket Name
+      description: Must be globally unique
+      placeholder: my-app-logs-123
+    validations:
+      required: true
+
+  - type: dropdown
+    id: region
+    attributes:
+      label: Region
+      options:
+        - asia-south1
+        - us-central1
+        - europe-west1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - dev
+        - test
+        - prod
+    validations:
+      required: true
+
+  - type: dropdown
+    id: public_access
+    attributes:
+      label: Public Access
+      options:
+        - "false"
