@@ -23,8 +23,13 @@ jobs:
       - name: Install Checkov
         run: pip install checkov
 
-      - name: Run Checkov (Soft Governance)
+      - name: Run Checkov #Soft Governance Mode - Report only, do not fail PR
         run: |
           checkov -d . \
             --quiet \
             --soft-fail
+
+      - name: Enfore Checkov #Enforce Critical - Fail PR on HIGH severity
+        run: |
+         checkov -d . \
+            --severity-level HIGH
