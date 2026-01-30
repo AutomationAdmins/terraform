@@ -33,3 +33,9 @@ jobs:
         run: |
          checkov -d . \
             --severity-level HIGH
+
+      - name: Run Checkov (Soft Governance with Exclusions)
+        run: |
+          checkov -d . \
+            --config-file .checkov.yaml \
+            --soft-fail

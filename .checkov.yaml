@@ -1,0 +1,34 @@
+# Checkov global configuration file
+# This is used to skip checks during PoC phase
+# Tighten these later for production enforcement
+
+skip_checks:
+  # -----------------------------
+  # Storage (Buckets)
+  # -----------------------------
+  - CKV_GCP_62   # Bucket versioning not enabled (POC skip)
+  - CKV_GCP_29   # Bucket encryption (CMEK) not enforced yet
+
+  # -----------------------------
+  # Networking
+  # -----------------------------
+  - CKV_GCP_2    # Public IP firewall rules (allow during PoC)
+  - CKV_GCP_9    # No flow logs (skip for now)
+
+  # -----------------------------
+  # IAM
+  # -----------------------------
+  - CKV_GCP_41   # IAM overly permissive roles (POC skip)
+
+  # -----------------------------
+  # Compute
+  # -----------------------------
+  - CKV_GCP_39   # Shielded VM not required yet
+  - CKV_GCP_38   # Secure boot disabled (PoC)
+
+  # -----------------------------
+  # Logging / Monitoring
+  # -----------------------------
+  - CKV_GCP_45   # Logging not enforced yet
+  - CKV_GCP_46   # Monitoring not enforced yet
+  - CKV_GCP_47   # Alerting not enforced yet
