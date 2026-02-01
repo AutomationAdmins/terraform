@@ -20,12 +20,14 @@ jobs:
         with:
           ref: automation   # base branch
 
-      - name: Parse Issue
-        id: issue
-        uses: stefanbuck/github-issue-parser@v3
-        with:
-          template-path: .github/ISSUE_TEMPLATE/request-bucket.yml
-
+      - name: Extract issue form values
+        id: vars
+        run: |
+          BODY='${{ github.event.issue.body }}'
+          echo "bucket_name=$(echo "$BODY" | grep -A1 "Bucket Name" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
+          echo "region=$(echo "$BODY" | grep -A1 "Region" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
+          echo "environment=$(echo "$BODY" | grep -A1 "Environment" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
+          echo "public_access=$(echo "$BODY" | grep -A1 "Public Access" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
       - name: Debug issue outputs
         run: |
           echo "bucket_name='${{ steps.issue.outputs.bucket_name }}'"
@@ -36,21 +38,21 @@ jobs:
 
       - name: Generate Terraform File
         run: |
-          BUCKET="${{ steps.issue.outputs.bucket_name }}"
-          REGION="${{ steps.issue.outputs.region }}"
-          ENV="${{ steps.issue.outputs.environment }}"
+          BUCKET="${{ steps.vars.outputs.bucket_name }}"
+          REGION="${{ steps.vars.outputs.region }}"
+          ENV="${{ steps.vars.outputs.environment }}"
 
           mkdir -p Projects/buckets
           cat <<EOF > Projects/buckets/buckets.tf
-          resource "google_storage_bucket" "${{ steps.issue.outputs.bucket_name }}" {
-            name     = "${{ steps.issue.outputs.bucket_name }}"
-            location = "${{ steps.issue.outputs.region }}"
+          resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
+            name     = "${{ steps.vars.outputs.bucket_name }}"
+            location = "${{ steps.vars.outputs.region }}"
 
             uniform_bucket_level_access = true
             public_access_prevention    = "enforced"
 
             labels = {
-              env   = "${{ steps.issue.outputs.environment }}"
+              env   = "${{ steps.vars.outputs.environment }}"
               owner = "selfservice"
             }
           }
