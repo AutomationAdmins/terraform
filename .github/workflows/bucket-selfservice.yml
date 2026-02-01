@@ -26,6 +26,14 @@ jobs:
         with:
           template-path: .github/ISSUE_TEMPLATE/request-bucket.yml
 
+      - name: Debug issue outputs
+        run: |
+          echo "bucket_name='${{ steps.issue.outputs.bucket_name }}'"
+          echo "region='${{ steps.issue.outputs.region }}'"
+          echo "environment='${{ steps.issue.outputs.environment }}'"
+          echo "public_access='${{ steps.issue.outputs.public_access }}'"
+
+
       - name: Generate Terraform File
         run: |
           BUCKET="${{ steps.issue.outputs.bucket_name }}"
