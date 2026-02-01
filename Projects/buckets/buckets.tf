@@ -6,7 +6,7 @@ resource "google_storage_bucket" "" {
   public_access_prevention    = "enforced"
 
   labels = {
-    env = ""
+    env   = ""
     owner = "selfservice"
   }
 }
