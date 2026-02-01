@@ -33,16 +33,16 @@ jobs:
           ENV="${{ steps.issue.outputs.environment }}"
 
           mkdir -p Projects/buckets
-          cat <<EOF > Projects/buckets/${BUCKET}.tf
-          resource "google_storage_bucket" "${BUCKET}" {
-            name     = "${BUCKET}"
-            location = "${REGION}"
+          cat <<EOF > Projects/buckets/buckets.tf
+          resource "google_storage_bucket" "${{ steps.issue.outputs.bucket_name }}" {
+            name     = "${{ steps.issue.outputs.bucket_name }}"
+            location = "${{ steps.issue.outputs.region }}"
 
             uniform_bucket_level_access = true
             public_access_prevention    = "enforced"
 
             labels = {
-              env   = "${ENV}"
+              env   = "${{ steps.issue.outputs.environment }}"
               owner = "selfservice"
             }
           }
