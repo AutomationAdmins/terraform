@@ -24,16 +24,17 @@ jobs:
         id: vars
         run: |
           BODY='${{ github.event.issue.body }}'
-          echo "bucket_name=$(echo "$BODY" | grep -A1 "Bucket Name" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
-          echo "region=$(echo "$BODY" | grep -A1 "Region" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
-          echo "environment=$(echo "$BODY" | grep -A1 "Environment" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
-          echo "public_access=$(echo "$BODY" | grep -A1 "Public Access" | tail -n1 | xargs)" >> $GITHUB_OUTPUT
-      - name: Debug issue outputs
+          bucket_name=$(echo "$BODY" | awk '/### Bucket Name/{getline; getline; print}')
+          region=$(echo "$BODY" | awk '/### Region/{getline; getline; print}') 
+          environment=$(echo "$BODY" | awk '/### Environment/{getline; getline; print}')
+          public_access=$(echo "$BODY" | awk '/### Public Access/{getline; getline; print}')
+
+      - name: Print  issue outputs
         run: |
-          echo "bucket_name='${{ steps.issue.outputs.bucket_name }}'"
-          echo "region='${{ steps.issue.outputs.region }}'"
-          echo "environment='${{ steps.issue.outputs.environment }}'"
-          echo "public_access='${{ steps.issue.outputs.public_access }}'"
+          echo "bucket_name='${{ steps.vars.outputs.bucket_name }}'"
+          echo "region='${{ steps.vars.outputs.region }}'"
+          echo "environment='${{ steps.vars.outputs.environment }}'"
+          echo "public_access='${{ steps.vars.outputs.public_access }}'"
 
 
       - name: Generate Terraform File
