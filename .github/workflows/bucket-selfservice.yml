@@ -73,7 +73,7 @@ jobs:
           ENV="${{ steps.vars.outputs.environment }}"
 
           mkdir -p Projects/buckets
-          cat <<EOF > Projects/buckets/${BUCKET}.tf
+          cat <<EOF > Projects/buckets/buckets.tf
           resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
             name     = "${{ steps.vars.outputs.bucket_name }}"
             location = "${{ steps.vars.outputs.region }}"
