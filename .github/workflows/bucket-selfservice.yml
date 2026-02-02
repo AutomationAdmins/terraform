@@ -20,37 +20,40 @@ jobs:
         with:
           ref: automation   # base branch
 
-      - name: Parse Issue
-        id: issue
-        uses: stefanbuck/github-issue-parser@v3
-        with:
-          template-path: .github/ISSUE_TEMPLATE/request-bucket.yml
-
-      - name: Debug issue outputs
+      - name: Extract issue form values
+        id: vars
         run: |
-          echo "bucket_name='${{ steps.issue.outputs.bucket_name }}'"
-          echo "region='${{ steps.issue.outputs.region }}'"
-          echo "environment='${{ steps.issue.outputs.environment }}'"
-          echo "public_access='${{ steps.issue.outputs.public_access }}'"
+          BODY='${{ github.event.issue.body }}'
+          bucket_name=$(echo "$BODY" | awk '/### Bucket Name/{getline; getline; print}')
+          region=$(echo "$BODY" | awk '/### Region/{getline; getline; print}') 
+          environment=$(echo "$BODY" | awk '/### Environment/{getline; getline; print}')
+          public_access=$(echo "$BODY" | awk '/### Public Access/{getline; getline; print}')
+
+      - name: Print  issue outputs
+        run: |
+          echo "bucket_name='${{ steps.vars.outputs.bucket_name }}'"
+          echo "region='${{ steps.vars.outputs.region }}'"
+          echo "environment='${{ steps.vars.outputs.environment }}'"
+          echo "public_access='${{ steps.vars.outputs.public_access }}'"
 
 
       - name: Generate Terraform File
         run: |
-          BUCKET="${{ steps.issue.outputs.bucket_name }}"
-          REGION="${{ steps.issue.outputs.region }}"
-          ENV="${{ steps.issue.outputs.environment }}"
+          BUCKET="${{ steps.vars.outputs.bucket_name }}"
+          REGION="${{ steps.vars.outputs.region }}"
+          ENV="${{ steps.vars.outputs.environment }}"
 
           mkdir -p Projects/buckets
           cat <<EOF > Projects/buckets/buckets.tf
-          resource "google_storage_bucket" "${{ steps.issue.outputs.bucket_name }}" {
-            name     = "${{ steps.issue.outputs.bucket_name }}"
-            location = "${{ steps.issue.outputs.region }}"
+          resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
+            name     = "${{ steps.vars.outputs.bucket_name }}"
+            location = "${{ steps.vars.outputs.region }}"
 
             uniform_bucket_level_access = true
             public_access_prevention    = "enforced"
 
             labels = {
-              env   = "${{ steps.issue.outputs.environment }}"
+              env   = "${{ steps.vars.outputs.environment }}"
               owner = "selfservice"
             }
           }
