@@ -88,20 +88,32 @@ jobs:
           }
           EOF
 
+      # -------------------------------
+      # Create Pull Request
+      # -------------------------------
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: automation
-          branch: bucket-${{ steps.vars.outputs.bucket_name }}
-          commit-message: "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
-          title: "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}"
-          body: |
-            ## GCS Bucket Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b $BRANCH_NAME
+          git add Projects/buckets/${{ steps.vars.outputs.bucket_name }}.tf
+          git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
+          git push origin $BRANCH_NAME
 
-            **Bucket:** `${{ steps.vars.outputs.bucket_name }}`
-            **Region:** `${{ steps.vars.outputs.region }}`
-            **Environment:** `${{ steps.vars.outputs.environment }}`
+          gh pr create \
+            --base "automation" \
+            --head "$BRANCH_NAME" \
+            --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}" \
+            --body-file - <<EOF
+          ## GCS Bucket Request
 
-            Requested via self-service issue.
-          labels: ready-for-plan
+          **Bucket:** `${{ steps.vars.outputs.bucket_name }}`
+          **Region:** `${{ steps.vars.outputs.region }}`
+          **Environment:** `${{ steps.vars.outputs.environment }}`
+
+          Requested via self-service issue.
+          EOF
+          gh pr edit $BRANCH_NAME --add-label "ready-for-plan"
