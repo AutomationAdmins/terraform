@@ -73,7 +73,9 @@ jobs:
           ENV="${{ steps.vars.outputs.environment }}"
 
           mkdir -p Projects/buckets
-          cat <<EOF > Projects/buckets/buckets.tf
+          touch Projects/buckets/buckets.tf
+          cat <<EOF >> Projects/buckets/buckets.tf
+
           resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
             name     = "${{ steps.vars.outputs.bucket_name }}"
             location = "${{ steps.vars.outputs.region }}"
@@ -88,6 +90,11 @@ jobs:
           }
           EOF
 
+      - name: Format Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - run: terraform fmt Projects/buckets/buckets.tf
+
       # -------------------------------
       # Create Pull Request
       # -------------------------------
@@ -99,7 +106,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b $BRANCH_NAME
-          git add Projects/buckets/${{ steps.vars.outputs.bucket_name }}.tf
+          git add Projects/buckets/buckets.tf
           git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
           git push origin $BRANCH_NAME
 
