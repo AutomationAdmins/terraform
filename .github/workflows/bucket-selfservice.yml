@@ -22,14 +22,43 @@ jobs:
 
       - name: Extract issue form values
         id: vars
+        shell: bash
         run: |
-          BODY='${{ github.event.issue.body }}'
-          bucket_name=$(echo "$BODY" | awk '/### Bucket Name/{getline; getline; print}')
-          region=$(echo "$BODY" | awk '/### Region/{getline; getline; print}') 
-          environment=$(echo "$BODY" | awk '/### Environment/{getline; getline; print}')
-          public_access=$(echo "$BODY" | awk '/### Public Access/{getline; getline; print}')
+          BODY="$(cat <<'EOF'
+          ${{ github.event.issue.body }}
+          EOF
+          )"
 
-      - name: Print  issue outputs
+          echo "===== ISSUE BODY ====="
+          echo "$BODY"
+          echo "======================"
+
+          bucket_name=$(echo "$BODY" | awk '
+            /^### Bucket Name/ {found=1; next}
+            found && NF {print; exit}
+          ')
+
+          region=$(echo "$BODY" | awk '
+            /^### Region/ {found=1; next}
+            found && NF {print; exit}
+          ')
+
+          environment=$(echo "$BODY" | awk '
+            /^### Environment/ {found=1; next}
+            found && NF {print; exit}
+          ')
+
+          public_access=$(echo "$BODY" | awk '
+            /^### Public Access/ {found=1; next}
+            found && NF {print; exit}
+          ')
+
+          echo "bucket_name=$bucket_name" >> "$GITHUB_OUTPUT"
+          echo "region=$region" >> "$GITHUB_OUTPUT"
+          echo "environment=$environment" >> "$GITHUB_OUTPUT"
+          echo "public_access=$public_access" >> "$GITHUB_OUTPUT"
+
+      - name: Print issue outputs
         run: |
           echo "bucket_name='${{ steps.vars.outputs.bucket_name }}'"
           echo "region='${{ steps.vars.outputs.region }}'"
@@ -44,7 +73,9 @@ jobs:
           ENV="${{ steps.vars.outputs.environment }}"
 
           mkdir -p Projects/buckets
-          cat <<EOF > Projects/buckets/buckets.tf
+          touch Projects/buckets/buckets.tf
+          cat <<EOF >> Projects/buckets/buckets.tf
+
           resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
             name     = "${{ steps.vars.outputs.bucket_name }}"
             location = "${{ steps.vars.outputs.region }}"
@@ -59,14 +90,37 @@ jobs:
           }
           EOF
 
+      - name: Format Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - run: terraform fmt Projects/buckets/buckets.tf
+
+      # -------------------------------
+      # Create Pull Request
+      # -------------------------------
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: automation
-          branch: bucket-${{ steps.issue.outputs.bucket_name }}
-          commit-message: "Auto: bucket ${{ steps.issue.outputs.bucket_name }}"
-          title: "Self-service bucket: ${{ steps.issue.outputs.bucket_name }}"
-          body: |
-            Bucket requested via self-service issue.
-          labels: ready-for-plan
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b $BRANCH_NAME
+          git add Projects/buckets/buckets.tf
+          git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --base "automation" \
+            --head "$BRANCH_NAME" \
+            --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}" \
+            --body-file - <<EOF
+          ## GCS Bucket Request
+
+          **Bucket:** `${{ steps.vars.outputs.bucket_name }}`
+          **Region:** `${{ steps.vars.outputs.region }}`
+          **Environment:** `${{ steps.vars.outputs.environment }}`
+
+          Requested via self-service issue.
+          EOF
+          gh pr edit $BRANCH_NAME --add-label "ready-for-plan"
