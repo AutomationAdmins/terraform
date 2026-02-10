@@ -1,8 +1,9 @@
 name: Terraform Security Scan (Checkov Hybrid)
 
 on:
-  pull_request:
-    branches: [automation]
+  push:
+   branches:
+      - bucket-*
 
 jobs:
   checkov:
