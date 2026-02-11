@@ -106,14 +106,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
         run: |
-          BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}"
+          BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
 
           git config --global user.name "infra-selfservice-bot"
           git config --global user.email "infra-bot@users.noreply.github.com"
 
           git checkout -b "$BRANCH_NAME"
           git add Projects/buckets/buckets.tf
-          git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
+          git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
           git push origin "$BRANCH_NAME"
 
           echo "${GH_TOKEN}" | gh auth login --with-token
@@ -121,7 +121,7 @@ jobs:
           gh pr create \
             --base automation \
             --head "$BRANCH_NAME" \
-            --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}" \
+            --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}" \
             --body "Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }}"
 
           gh pr edit "$BRANCH_NAME" --add-label "ready-for-plan"
