@@ -116,7 +116,6 @@ jobs:
           git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
           git push origin "$BRANCH_NAME"
 
-          echo "${GH_TOKEN}" | gh auth login --with-token
 
           gh pr create \
             --base automation \
