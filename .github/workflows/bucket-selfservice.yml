@@ -72,9 +72,7 @@ jobs:
           REGION="${{ steps.vars.outputs.region }}"
           ENV="${{ steps.vars.outputs.environment }}"
 
-          mkdir -p Projects/buckets
-          touch Projects/buckets/buckets.tf
-          cat <<EOF >> Projects/buckets/buckets.tf
+          cat <<EOF >> Projects/gcs.tf
 
           resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
             name     = "${{ steps.vars.outputs.bucket_name }}"
@@ -93,7 +91,7 @@ jobs:
       - name: Format Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - run: terraform fmt Projects/buckets/buckets.tf
+      - run: terraform fmt Projects/gcs.tf
       - name: Debug Token
         run: |
           if [ -z "${{ secrets.INFRA_BOT_PAT }}" ]; then
