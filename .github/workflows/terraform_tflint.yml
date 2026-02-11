@@ -1,8 +1,9 @@
 name: Terraform TFLint
 
 on:
-  pull_request:
-    branches: [automation]
+  push:
+    branches:
+      - bucket-*
 
 jobs:
   tflint:
