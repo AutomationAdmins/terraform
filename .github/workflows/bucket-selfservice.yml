@@ -102,6 +102,11 @@ jobs:
           else
             echo "PAT exists"
           fi
+      - name: Debug GH auth
+        env:
+          GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
+        run: |
+          gh auth status || true
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
