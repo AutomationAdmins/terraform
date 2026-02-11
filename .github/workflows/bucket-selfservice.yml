@@ -95,32 +95,26 @@ jobs:
 
       - run: terraform fmt Projects/buckets/buckets.tf
 
-      # -------------------------------
-      # Create Pull Request
-      # -------------------------------
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
         run: |
           BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}"
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b $BRANCH_NAME
+
+          git config --global user.name "infra-selfservice-bot"
+          git config --global user.email "infra-bot@users.noreply.github.com"
+
+          git checkout -b "$BRANCH_NAME"
           git add Projects/buckets/buckets.tf
           git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}"
-          git push origin $BRANCH_NAME
+          git push origin "$BRANCH_NAME"
+
+          gh auth setup-git
 
           gh pr create \
-            --base "automation" \
+            --base automation \
             --head "$BRANCH_NAME" \
             --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}" \
-            --body-file - <<EOF
-          ## GCS Bucket Request
+            --body "Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }}"
 
-          **Bucket:** `${{ steps.vars.outputs.bucket_name }}`
-          **Region:** `${{ steps.vars.outputs.region }}`
-          **Environment:** `${{ steps.vars.outputs.environment }}`
-
-          Requested via self-service issue.
-          EOF
-          gh pr edit $BRANCH_NAME --add-label "ready-for-plan"
+          gh pr edit "$BRANCH_NAME" --add-label "ready-for-plan"
