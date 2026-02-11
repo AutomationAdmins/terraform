@@ -94,7 +94,14 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - run: terraform fmt Projects/buckets/buckets.tf
-
+      - name: Debug Token
+        run: |
+          if [ -z "${{ secrets.INFRA_BOT_PAT }}" ]; then
+            echo "PAT is empty"
+            exit 1
+          else
+            echo "PAT exists"
+          fi
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
@@ -118,12 +125,3 @@ jobs:
             --body "Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }}"
 
           gh pr edit "$BRANCH_NAME" --add-label "ready-for-plan"
-
-      - name: Debug Token
-        run: |
-          if [ -z "${{ secrets.INFRA_BOT_PAT }}" ]; then
-            echo "PAT is empty"
-            exit 1
-          else
-            echo "PAT exists"
-          fi
