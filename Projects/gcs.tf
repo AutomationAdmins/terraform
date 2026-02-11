@@ -4,3 +4,15 @@ resource "google_storage_bucket" "test_bucket" {
 
   uniform_bucket_level_access = true
 }
+resource "google_storage_bucket" "dev-bucket-578" {
+  name     = "dev-bucket-578"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
