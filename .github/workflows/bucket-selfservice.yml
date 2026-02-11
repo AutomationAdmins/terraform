@@ -100,7 +100,7 @@ jobs:
       # -------------------------------
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
         run: |
           BRANCH_NAME="bucket-${{ steps.vars.outputs.bucket_name }}"
           git config --global user.name "github-actions[bot]"
