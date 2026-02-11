@@ -1,8 +1,18 @@
-name: Request GCS Bucket
-description: Self-service GCS bucket request
+name: Request Cloud Storage Bucket
+description: Self-service bucket request (AWS S3 or GCP GCS)
 title: "[Bucket Request]: "
 labels: ["infra-request"]
 body:
+  - type: dropdown
+    id: cloud_provider
+    attributes:
+      label: Cloud Provider
+      options:
+        - GCP
+        - AWS
+    validations:
+      required: true
+
   - type: input
     id: bucket_name
     attributes:
@@ -12,14 +22,12 @@ body:
     validations:
       required: true
 
-  - type: dropdown
+  - type: input
     id: region
     attributes:
       label: Region
-      options:
-        - asia-south1
-        - us-central1
-        - europe-west1
+      description: "GCP: asia-south1, us-central1, europe-west1 | AWS: ap-south-1, us-east-1, eu-west-1"
+      placeholder: asia-south1
     validations:
       required: true
 

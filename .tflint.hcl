@@ -10,6 +10,13 @@ plugin "google" {
   source  = "github.com/terraform-linters/tflint-ruleset-google"
 }
 
+# AWS ruleset
+plugin "aws" {
+  enabled = true
+  version = "0.32.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-aws"
+}
+
 # Soft governance: enable useful rules but not blocking
 rule "google_resource_missing_labels" {
   enabled = true

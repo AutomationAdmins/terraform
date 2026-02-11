@@ -53,13 +53,20 @@ jobs:
             found && NF {print; exit}
           ')
 
+          cloud_provider=$(echo "$BODY" | awk '
+            /^### Cloud Provider/ {found=1; next}
+            found && NF {print; exit}
+          ')
+
           echo "bucket_name=$bucket_name" >> "$GITHUB_OUTPUT"
           echo "region=$region" >> "$GITHUB_OUTPUT"
           echo "environment=$environment" >> "$GITHUB_OUTPUT"
           echo "public_access=$public_access" >> "$GITHUB_OUTPUT"
+          echo "cloud_provider=$cloud_provider" >> "$GITHUB_OUTPUT"
 
       - name: Print issue outputs
         run: |
+          echo "cloud_provider='${{ steps.vars.outputs.cloud_provider }}'"
           echo "bucket_name='${{ steps.vars.outputs.bucket_name }}'"
           echo "region='${{ steps.vars.outputs.region }}'"
           echo "environment='${{ steps.vars.outputs.environment }}'"
@@ -71,27 +78,52 @@ jobs:
           BUCKET="${{ steps.vars.outputs.bucket_name }}"
           REGION="${{ steps.vars.outputs.region }}"
           ENV="${{ steps.vars.outputs.environment }}"
+          PROVIDER="${{ steps.vars.outputs.cloud_provider }}"
+          SAFE_NAME=$(echo "$BUCKET" | tr '-' '_')
 
-          cat <<EOF >> Projects/gcs.tf
+          if [ "$PROVIDER" = "AWS" ]; then
+            cat <<EOF >> Projects/s3.tf
 
-          resource "google_storage_bucket" "${{ steps.vars.outputs.bucket_name }}" {
-            name     = "${{ steps.vars.outputs.bucket_name }}"
-            location = "${{ steps.vars.outputs.region }}"
+          resource "aws_s3_bucket" "${SAFE_NAME}" {
+            bucket = "${BUCKET}"
+
+            tags = {
+              Environment = "${ENV}"
+              Owner       = "selfservice"
+            }
+          }
+
+          resource "aws_s3_bucket_public_access_block" "${SAFE_NAME}_public_access" {
+            bucket = aws_s3_bucket.${SAFE_NAME}.id
+
+            block_public_acls       = true
+            block_public_policy     = true
+            ignore_public_acls      = true
+            restrict_public_buckets = true
+          }
+          EOF
+          else
+            cat <<EOF >> Projects/gcs.tf
+
+          resource "google_storage_bucket" "${SAFE_NAME}" {
+            name     = "${BUCKET}"
+            location = "${REGION}"
 
             uniform_bucket_level_access = true
             public_access_prevention    = "enforced"
 
             labels = {
-              env   = "${{ steps.vars.outputs.environment }}"
+              env   = "${ENV}"
               owner = "selfservice"
             }
           }
           EOF
+          fi
 
       - name: Format Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - run: terraform fmt Projects/gcs.tf
+      - run: terraform fmt Projects/
       - name: Debug Token
         run: |
           if [ -z "${{ secrets.INFRA_BOT_PAT }}" ]; then
@@ -115,15 +147,15 @@ jobs:
           git config --global user.email "infra-bot@users.noreply.github.com"
 
           git checkout -b "$BRANCH_NAME"
-          git add Projects/gcs.tf
-          git commit -m "Auto: bucket ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
+          git add Projects/
+          git commit -m "Auto: ${{ steps.vars.outputs.cloud_provider }} bucket ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
           git push origin "$BRANCH_NAME"
 
 
           gh pr create \
             --base automation \
             --head "$BRANCH_NAME" \
-            --title "Self-service bucket: ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}" \
-            --body "Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }}"
+            --title "Self-service ${{ steps.vars.outputs.cloud_provider }} bucket: ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}" \
+            --body "Provider: ${{ steps.vars.outputs.cloud_provider }} | Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }}"
 
           gh pr edit "$BRANCH_NAME" --add-label "ready-for-plan"

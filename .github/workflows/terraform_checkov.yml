@@ -26,7 +26,7 @@ jobs:
         run: |
           checkov -d Projects --soft-fail
 
-      # 2️⃣ Enforce ONLY public bucket policy (CKV_GCP_114)
+      # 2️⃣ Enforce public bucket policy (GCP + AWS)
       - name: Enforce Public Access Prevention on Buckets
         run: |
-          checkov -d Projects -c CKV_GCP_114
+          checkov -d Projects -c CKV_GCP_114,CKV2_AWS_6
