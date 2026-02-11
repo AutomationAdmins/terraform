@@ -1,7 +1,7 @@
 name: Terraform Plan #(Label Triggered)
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [automation]
     types: [labeled]
 
@@ -17,7 +17,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Projects/buckets
+        working-directory: Projects
 
     steps:
       - uses: actions/checkout@v4
