@@ -1,4 +1,4 @@
-name: Terraform apply
+name: Terraform Apply (GCP)
 
 # Trigger pipeline on push to main branch or manual run
 on:
@@ -24,13 +24,6 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Authenticate to AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-2
 
       - name: Terraform Init
         run: terraform init -reconfigure

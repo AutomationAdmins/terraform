@@ -22,11 +22,16 @@ jobs:
         run: pip install checkov
 
       # 1️⃣ Soft governance - report everything but DO NOT fail
-      - name: Checkov Soft Governance
+      - name: Checkov Soft Governance (GCP)
         run: |
           checkov -d Projects --soft-fail
+
+      - name: Checkov Soft Governance (AWS)
+        run: |
+          checkov -d Projects-AWS --soft-fail
 
       # 2️⃣ Enforce public bucket policy (GCP + AWS)
       - name: Enforce Public Access Prevention on Buckets
         run: |
-          checkov -d Projects -c CKV_GCP_114,CKV2_AWS_6
+          checkov -d Projects -c CKV_GCP_114
+          checkov -d Projects-AWS -c CKV2_AWS_6

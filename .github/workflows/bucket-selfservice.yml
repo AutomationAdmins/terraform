@@ -82,7 +82,7 @@ jobs:
           SAFE_NAME=$(echo "$BUCKET" | tr '-' '_')
 
           if [ "$PROVIDER" = "AWS" ]; then
-            cat <<EOF >> Projects/s3.tf
+            cat <<EOF >> Projects-AWS/s3.tf
 
           resource "aws_s3_bucket" "${SAFE_NAME}" {
             bucket = "${BUCKET}"
@@ -124,6 +124,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - run: terraform fmt Projects/
+      - run: terraform fmt Projects-AWS/
       - name: Debug Token
         run: |
           if [ -z "${{ secrets.INFRA_BOT_PAT }}" ]; then
@@ -147,7 +148,7 @@ jobs:
           git config --global user.email "infra-bot@users.noreply.github.com"
 
           git checkout -b "$BRANCH_NAME"
-          git add Projects/
+          git add Projects/ Projects-AWS/
           git commit -m "Auto: ${{ steps.vars.outputs.cloud_provider }} bucket ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}"
           git push origin "$BRANCH_NAME"
 

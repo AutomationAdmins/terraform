@@ -1,4 +1,4 @@
-name: Terraform Plan - GCP #(Label Triggered)
+name: Terraform Plan - AWS #(Label Triggered)
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Projects
+        working-directory: Projects-AWS
 
     steps:
       - uses: actions/checkout@v4
@@ -26,9 +26,12 @@ jobs:
         with:
           terraform_version: 1.14.3
 
-      - uses: google-github-actions/auth@v2
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
 
       - name: Terraform Init
         run: terraform init -reconfigure
@@ -44,7 +47,7 @@ jobs:
 
       - name: Terraform Plan Summary
         run: |
-          echo "## Terraform Plan Summary" > summary.md
+          echo "## Terraform Plan Summary (AWS)" > summary.md
           terraform show -no-color tfplan >> summary.md
 
       - name: Comment Plan on PR
@@ -52,7 +55,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const summary = fs.readFileSync('Projects/summary.md', 'utf8');
+            const summary = fs.readFileSync('Projects-AWS/summary.md', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
