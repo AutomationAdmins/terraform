@@ -26,8 +26,8 @@ body:
     id: region
     attributes:
       label: Region
-      description: "GCP: asia-south1, us-central1, europe-west1 | AWS: ap-south-1, us-east-1, eu-west-1"
-      placeholder: asia-south1
+      description: "GCP: asia-south1, us-central1, europe-west1 | AWS: ap-southeast-2, us-east-1, eu-west-1"
+      placeholder: ap-southeast-2
     validations:
       required: true
 
@@ -48,3 +48,4 @@ body:
       label: Public Access
       options:
         - "false"
+        - "true"
