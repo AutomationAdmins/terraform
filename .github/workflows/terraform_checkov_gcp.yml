@@ -1,0 +1,32 @@
+name: Terraform Security Scan - GCP (Checkov)
+
+on:
+  pull_request:
+    branches:
+      - automation
+    paths:
+      - 'Projects/**'
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Checkov Soft Governance (GCP)
+        run: |
+          checkov -d Projects --soft-fail
+
+      - name: Enforce Public Access Prevention on GCP Buckets
+        run: |
+          checkov -d Projects -c CKV_GCP_114

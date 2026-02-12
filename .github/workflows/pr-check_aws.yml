@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - bucket-*
+    paths:
+      - 'Projects-AWS/**'
 
 jobs:
   validate:

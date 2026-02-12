@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [automation]
     types: [labeled]
+    paths:
+      - 'Projects/**'
 
 jobs:
   plan:
