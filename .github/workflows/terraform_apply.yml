@@ -2,7 +2,11 @@ name: Terraform Apply (GCP)
 
 # Trigger pipeline on push to main branch or manual run
 on:
-  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - 'Projects/**'
 
 jobs:
   terraform:

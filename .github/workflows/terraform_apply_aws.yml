@@ -1,7 +1,11 @@
 name: Terraform Apply (AWS)
 
 on:
-  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - 'Projects-AWS/**'
 
 jobs:
   terraform:
