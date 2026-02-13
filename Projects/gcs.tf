@@ -68,3 +68,16 @@ resource "google_storage_bucket" "first_dev_bucket" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "bnh_ght_thy" {
+  name     = "bnh-ght-thy"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
