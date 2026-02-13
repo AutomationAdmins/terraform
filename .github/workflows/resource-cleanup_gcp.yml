@@ -1,0 +1,53 @@
+name: Resource Cleanup (GCP)
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_type:
+        description: "Resource type (e.g. google_storage_bucket)"
+        required: true
+        type: choice
+        options:
+          - google_storage_bucket
+      resource_name:
+        description: "Resource name in Terraform (e.g. my_dev_bucket_1)"
+        required: true
+      confirm:
+        description: "Type CLEANUP to confirm"
+        required: true
+
+jobs:
+  cleanup:
+    if: github.event.inputs.confirm == 'CLEANUP'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: Projects
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: automation
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -reconfigure
+
+      - name: Destroy Target Resource
+        run: |
+          RESOURCE="${{ github.event.inputs.resource_type }}.${{ github.event.inputs.resource_name }}"
+          echo "Destroying: $RESOURCE"
+          terraform destroy -target="$RESOURCE" -auto-approve

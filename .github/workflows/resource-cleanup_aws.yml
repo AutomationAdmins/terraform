@@ -1,0 +1,56 @@
+name: Resource Cleanup (AWS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_type:
+        description: "Resource type (e.g. aws_s3_bucket)"
+        required: true
+        type: choice
+        options:
+          - aws_s3_bucket
+          - aws_s3_bucket_public_access_block
+      resource_name:
+        description: "Resource name in Terraform (e.g. my_dev_bucket_1)"
+        required: true
+      confirm:
+        description: "Type CLEANUP to confirm"
+        required: true
+
+jobs:
+  cleanup:
+    if: github.event.inputs.confirm == 'CLEANUP'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: Projects-AWS
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: automation
+
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -reconfigure
+
+      - name: Destroy Target Resource
+        run: |
+          RESOURCE="${{ github.event.inputs.resource_type }}.${{ github.event.inputs.resource_name }}"
+          echo "Destroying: $RESOURCE"
+          terraform destroy -target="$RESOURCE" -auto-approve
