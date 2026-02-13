@@ -1,25 +1,25 @@
 :root {
-  --bg: #0a0e17;
-  --bg-secondary: #111827;
-  --card-bg: #1a1f2e;
-  --card-bg-hover: #1f2538;
-  --border: #2a3040;
-  --border-glow: rgba(124, 58, 237, 0.3);
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --text-bright: #ffffff;
+  --bg: #f8f9fc;
+  --bg-secondary: #eef0f5;
+  --card-bg: #ffffff;
+  --card-bg-hover: #fafbff;
+  --border: #e2e5ed;
+  --border-glow: rgba(124, 58, 237, 0.2);
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --text-bright: #0f172a;
   --accent-purple: #7c3aed;
-  --accent-purple-light: #a78bfa;
+  --accent-purple-light: #6d28d9;
   --accent-cyan: #06b6d4;
-  --accent-cyan-light: #67e8f9;
+  --accent-cyan-light: #0891b2;
   --primary: #7c3aed;
   --primary-hover: #6d28d9;
-  --success: #3fb950;
-  --danger: #f85149;
-  --warning: #d29922;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #ca8a04;
   --radius: 12px;
   --radius-lg: 16px;
-  --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.08);
+  --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.06);
 }
 
 * {
@@ -45,8 +45,8 @@ body {
   right: 0;
   bottom: 0;
   background-image:
-    linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
   z-index: 0;
@@ -59,7 +59,7 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(ellipse at 50% 0%, rgba(124, 58, 237, 0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(124, 58, 237, 0.06) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -190,7 +190,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--card-bg);
+  background: var(--bg-secondary);
   border-radius: 10px;
   border: 1px solid var(--border);
 }
@@ -220,6 +220,7 @@ body {
   padding: 1.75rem;
   margin-bottom: 1rem;
   transition: border-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .card:hover {
@@ -355,7 +356,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .user-name-text {
@@ -393,7 +394,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 1.25rem;
-  background: var(--bg);
+  background: var(--bg-secondary);
   border: 2px solid var(--border);
   border-radius: var(--radius);
   transition: all 0.2s;
@@ -409,9 +410,9 @@ body {
 
 .provider-card input:checked + .provider-card-inner {
   border-color: var(--accent-purple);
-  background: rgba(124, 58, 237, 0.08);
+  background: rgba(124, 58, 237, 0.06);
   color: var(--text-bright);
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.08);
 }
 
 /* ---- Form ---- */
@@ -442,7 +443,7 @@ body {
 .form-group textarea {
   width: 100%;
   padding: 10px 14px;
-  background: var(--bg);
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
@@ -567,8 +568,8 @@ body {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border: 2px solid rgba(124, 58, 237, 0.2);
+  border-top-color: var(--accent-purple);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
