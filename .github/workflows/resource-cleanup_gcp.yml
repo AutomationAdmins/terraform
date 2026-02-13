@@ -3,22 +3,13 @@ name: Resource Cleanup (GCP)
 on:
   workflow_dispatch:
     inputs:
-      resource_type:
-        description: "Resource type (e.g. google_storage_bucket)"
-        required: true
-        type: choice
-        options:
-          - google_storage_bucket
-      resource_name:
-        description: "Resource name in Terraform (e.g. my_dev_bucket_1)"
-        required: true
       confirm:
-        description: "Type CLEANUP to confirm"
+        description: "Type DESTROY-ALL to confirm"
         required: true
 
 jobs:
   cleanup:
-    if: github.event.inputs.confirm == 'CLEANUP'
+    if: github.event.inputs.confirm == 'DESTROY-ALL'
     runs-on: ubuntu-latest
 
     permissions:
@@ -46,8 +37,5 @@ jobs:
       - name: Terraform Init
         run: terraform init -reconfigure
 
-      - name: Destroy Target Resource
-        run: |
-          RESOURCE="${{ github.event.inputs.resource_type }}.${{ github.event.inputs.resource_name }}"
-          echo "Destroying: $RESOURCE"
-          terraform destroy -target="$RESOURCE" -auto-approve
+      - name: Destroy All Resources
+        run: terraform destroy -auto-approve
