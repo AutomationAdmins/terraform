@@ -169,6 +169,15 @@ function showApp() {
 // Region dropdown — changes based on provider
 // ============================================================
 
+// Sync provider radio cards with hidden select
+document.querySelectorAll('input[name="cloud_provider_radio"]').forEach((radio) => {
+  radio.addEventListener('change', (e) => {
+    const provider = e.target.value;
+    $('#cloud_provider').value = provider;
+    $('#cloud_provider').dispatchEvent(new Event('change'));
+  });
+});
+
 $('#cloud_provider').addEventListener('change', (e) => {
   const provider = e.target.value;
   const regionSelect = $('#region');

@@ -3,22 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Infra Self-Service Portal</title>
+  <title>CloudGate | Infra Self-Service</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Animated background particles -->
+  <div class="bg-grid"></div>
+
   <div class="container">
-    <!-- Header -->
-    <header>
-      <h1>☁️ Infra Self-Service Portal</h1>
-      <p class="subtitle">Request cloud resources with automated provisioning</p>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="url(#cloud-grad)"/>
+            <defs><linearGradient id="cloud-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+          </svg>
+          <span class="brand-text">Cloud<span class="brand-accent">Gate</span></span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="#" class="nav-link active">Dashboard</a>
+        <a href="#" class="nav-link">Docs</a>
+      </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-badge">SELF-SERVICE PORTAL</div>
+      <h1>Infrastructure<br /><span class="gradient-text">On Demand</span></h1>
+      <p class="subtitle">Provision cloud resources across AWS & GCP with automated Terraform pipelines</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="stat-value" id="stat-auto">Automated</div>
+            <div class="stat-label">Provisioning</div>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">Multi-Cloud</div>
+            <div class="stat-label">AWS & GCP</div>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3fb950" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">Secure</div>
+            <div class="stat-label">Policy Enforced</div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- Login Section -->
-    <div id="login-section" class="card">
+    <div id="login-section" class="card card-glow">
+      <div class="card-header-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
       <h2>Sign in to continue</h2>
       <p>Authenticate with your GitHub account to submit infrastructure requests.</p>
-      <button id="login-btn" class="btn btn-primary">
+      <button id="login-btn" class="btn btn-primary btn-lg">
         <svg class="github-icon" viewBox="0 0 16 16" width="20" height="20">
           <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
         </svg>
@@ -31,7 +89,10 @@
       <div class="user-bar">
         <div class="user-info">
           <img id="user-avatar" src="" alt="avatar" class="avatar" />
-          <span id="user-name"></span>
+          <div>
+            <span id="user-name" class="user-name-text"></span>
+            <span class="user-role">Developer</span>
+          </div>
         </div>
         <button id="logout-btn" class="btn btn-sm btn-outline">Sign out</button>
       </div>
@@ -39,56 +100,81 @@
 
     <!-- Request Form -->
     <div id="form-section" class="card hidden">
-      <h2>Request Cloud Storage Bucket</h2>
+      <div class="card-title-row">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent-purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <h2>New Bucket Request</h2>
+      </div>
       <form id="bucket-form">
+        <!-- Provider Selection Cards -->
         <div class="form-group">
-          <label for="cloud_provider">Cloud Provider <span class="required">*</span></label>
-          <select id="cloud_provider" required>
+          <label>Cloud Provider <span class="required">*</span></label>
+          <div class="provider-cards">
+            <label class="provider-card" data-provider="AWS">
+              <input type="radio" name="cloud_provider_radio" value="AWS" required />
+              <div class="provider-card-inner">
+                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9900" d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576a.37.37 0 0 1 .064.2c0 .084-.048.168-.152.252l-.504.336a.382.382 0 0 1-.208.076c-.08 0-.16-.04-.24-.112a2.47 2.47 0 0 1-.288-.376 6.18 6.18 0 0 1-.248-.472c-.624.736-1.408 1.104-2.352 1.104-.672 0-1.208-.192-1.6-.576-.392-.384-.592-.896-.592-1.536 0-.68.24-1.232.728-1.648s1.136-.624 1.96-.624c.272 0 .552.024.848.064.296.04.6.104.92.176v-.584c0-.608-.128-1.032-.384-1.28-.264-.248-.704-.368-1.328-.368-.288 0-.584.032-.888.104-.304.072-.6.168-.888.28a2.13 2.13 0 0 1-.272.12.47.47 0 0 1-.12.02c-.168 0-.252-.12-.252-.368v-.392c0-.192.024-.336.08-.424a.826.826 0 0 1 .328-.236c.288-.144.632-.264 1.032-.36a5.09 5.09 0 0 1 1.272-.152c.968 0 1.676.22 2.128.66.448.44.676 1.108.676 2.008v2.64zm-3.24 1.2c.264 0 .536-.048.824-.144.288-.096.544-.272.76-.52a1.27 1.27 0 0 0 .316-.592c.056-.208.088-.456.088-.744v-.36a6.76 6.76 0 0 0-.736-.136 6.02 6.02 0 0 0-.752-.048c-.536 0-.928.104-1.184.32-.256.216-.38.528-.38.936 0 .384.096.672.296.864.192.2.48.296.864.296l-.096.128zm6.392.936c-.216 0-.36-.04-.44-.12-.08-.072-.152-.232-.208-.44l-2.32-7.632a1.97 1.97 0 0 1-.088-.464c0-.184.092-.288.272-.288h.784c.228 0 .38.04.456.12.084.072.148.232.204.44l1.66 6.54 1.54-6.54c.048-.216.112-.368.196-.44.084-.072.244-.12.464-.12h.64c.228 0 .384.04.464.12.08.072.152.224.196.44l1.56 6.62 1.712-6.62c.056-.216.124-.368.204-.44.084-.072.236-.12.456-.12h.744c.18 0 .28.096.28.288 0 .056-.008.12-.024.192a1.86 1.86 0 0 1-.064.28l-2.384 7.632c-.056.216-.128.368-.208.44-.08.072-.232.12-.44.12h-.688c-.228 0-.38-.04-.464-.12-.08-.08-.148-.232-.192-.448L14.74 5.68l-1.532 6.36c-.048.224-.112.376-.192.448-.08.08-.24.12-.464.12h-.688z"/><path fill="#FF9900" d="M21.384 13.248c-2.16 1.596-5.292 2.444-7.992 2.444-3.78 0-7.188-1.4-9.768-3.724-.204-.184-.024-.436.22-.292 2.784 1.62 6.228 2.596 9.78 2.596 2.4 0 5.04-.496 7.464-1.528.364-.164.672.24.296.504z"/><path fill="#FF9900" d="M22.232 12.252c-.276-.356-1.828-.168-2.528-.084-.212.024-.244-.16-.052-.296 1.236-.868 3.264-.616 3.5-.328.24.296-.064 2.332-1.224 3.308-.18.148-.348.068-.268-.128.26-.648.848-2.108.572-2.472z"/></svg>
+                <span>AWS</span>
+              </div>
+            </label>
+            <label class="provider-card" data-provider="GCP">
+              <input type="radio" name="cloud_provider_radio" value="GCP" required />
+              <div class="provider-card-inner">
+                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4285F4" d="M12.65 4.05h4.78l-1.57 1.57-.58 2.66h2.21l-3.61 5.48h1.56l-5.13 6.19 1.96-4.62H10.3l2.35-5.84h-2.2z"/><path fill="#34A853" d="M7.33 12.64l-1.57 1.57-.58 2.66h2.21L3.78 22.35h1.56L.21 28.54l1.96-4.62H.2l2.35-5.84h-2.2l2.43-6.01h4.78" opacity="0"/><path fill="#4285F4" d="M14.2 2.5L12 4.7l.65-.65h-1.3A7.5 7.5 0 0 0 4.7 12l-2.2 2.2A9.99 9.99 0 0 1 12 2z"/><path fill="#FBBC05" d="M22 12c0 1.77-.46 3.43-1.27 4.88l-2.2-2.2A7.49 7.49 0 0 0 19.5 12c0-.97-.18-1.9-.52-2.75l2.2-2.2C21.85 8.74 22 10 22 12z" opacity="0.9"/><circle cx="12" cy="12" r="3.5" fill="#4285F4"/><path fill="#34A853" d="M12 22a9.96 9.96 0 0 1-7.73-3.65l2.2-2.2A7.48 7.48 0 0 0 12 19.5c1.4 0 2.7-.38 3.82-1.05l2.2 2.2A9.96 9.96 0 0 1 12 22z" opacity="0.9"/><path fill="#EA4335" d="M5.25 7.05A7.47 7.47 0 0 0 4.5 12c0 1.28.32 2.49.88 3.55l-2.2 2.2A9.95 9.95 0 0 1 2 12c0-2.15.68-4.14 1.83-5.77l2.2 2.2C5.7 8.08 5.44 8 5.25 7.05z" opacity="0.9"/></svg>
+                <span>GCP</span>
+              </div>
+            </label>
+          </div>
+          <select id="cloud_provider" class="hidden" required>
             <option value="">Select provider...</option>
             <option value="GCP">GCP</option>
             <option value="AWS">AWS</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label for="bucket_name">Bucket Name <span class="required">*</span></label>
-          <input type="text" id="bucket_name" placeholder="my-app-logs-123" required />
-          <small>Must be globally unique</small>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bucket_name">Bucket Name <span class="required">*</span></label>
+            <input type="text" id="bucket_name" placeholder="my-app-logs-123" required />
+            <small>Must be globally unique</small>
+          </div>
+          <div class="form-group">
+            <label for="region">Region <span class="required">*</span></label>
+            <select id="region" required>
+              <option value="">Select region...</option>
+            </select>
+            <small id="region-hint"></small>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="region">Region <span class="required">*</span></label>
-          <select id="region" required>
-            <option value="">Select region...</option>
-          </select>
-          <small id="region-hint"></small>
-        </div>
-
-        <div class="form-group">
-          <label for="environment">Environment <span class="required">*</span></label>
-          <select id="environment" required>
-            <option value="">Select environment...</option>
-            <option value="dev">dev</option>
-            <option value="test">test</option>
-            <option value="prod">prod</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="public_access">Public Access</label>
-          <select id="public_access">
-            <option value="false">false</option>
-            <option value="true">true</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="environment">Environment <span class="required">*</span></label>
+            <select id="environment" required>
+              <option value="">Select environment...</option>
+              <option value="dev">Development</option>
+              <option value="test">Testing</option>
+              <option value="prod">Production</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="public_access">Public Access</label>
+            <select id="public_access">
+              <option value="false">Disabled (Recommended)</option>
+              <option value="true">Enabled</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="justification">Business Justification</label>
-          <textarea id="justification" rows="3" placeholder="Why do you need this bucket?"></textarea>
+          <textarea id="justification" rows="3" placeholder="Describe why you need this bucket..."></textarea>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" id="submit-btn">Submit Request</button>
+          <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Submit Request
+          </button>
         </div>
       </form>
     </div>
@@ -100,12 +186,21 @@
 
     <!-- Recent Requests -->
     <div id="requests-section" class="card hidden">
-      <h2>Your Recent Requests</h2>
+      <div class="card-title-row">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <h2>Recent Requests</h2>
+      </div>
       <div id="requests-list"></div>
     </div>
 
     <footer>
-      <p>Powered by GitHub Issues &amp; Terraform Automation</p>
+      <div class="footer-content">
+        <div class="footer-brand">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="url(#cloud-grad2)"/><defs><linearGradient id="cloud-grad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs></svg>
+          CloudGate
+        </div>
+        <p>Powered by GitHub Issues, Terraform & Automation</p>
+      </div>
     </footer>
   </div>
 
