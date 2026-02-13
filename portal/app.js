@@ -123,14 +123,15 @@ function showPATLogin() {
 // ============================================================
 
 async function ghAPI(endpoint, token = accessToken, options = {}) {
+  const { headers: optHeaders, ...restOptions } = options;
   const res = await fetch(`https://api.github.com${endpoint}`, {
+    ...restOptions,
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
-      ...options.headers,
+      ...optHeaders,
     },
-    ...options,
   });
 
   if (!res.ok) {
