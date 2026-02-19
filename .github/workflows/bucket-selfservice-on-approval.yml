@@ -1,0 +1,48 @@
+name: Bucket Self Service Bot - On Approval
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  bucket:
+    if: contains(github.event.issue.labels.*.name, 'infra-request') && github.event.label.name == 'approved-by-admin'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: automation
+      - name: Extract issue form values
+        id: vars
+        shell: bash
+        run: |
+          BODY="$(cat <<'EOF'
+          ${{ github.event.issue.body }}
+          EOF
+          )"
+          echo "===== ISSUE BODY ====="
+          echo "$BODY"
+          echo "======================"
+          bucket_name=$(echo "$BODY" | awk '/^### Bucket Name/ {found=1; next} found && NF {print; exit}')
+          region=$(echo "$BODY" | awk '/^### Region/ {found=1; next} found && NF {print; exit}')
+          environment=$(echo "$BODY" | awk '/^### Environment/ {found=1; next} found && NF {print; exit}')
+          public_access=$(echo "$BODY" | awk '/^### Public Access/ {found=1; next} found && NF {print; exit}')
+          cloud_provider=$(echo "$BODY" | awk '/^### Cloud Provider/ {found=1; next} found && NF {print; exit}')
+          echo "bucket_name=$bucket_name" >> "$GITHUB_OUTPUT"
+          echo "region=$region" >> "$GITHUB_OUTPUT"
+          echo "environment=$environment" >> "$GITHUB_OUTPUT"
+          echo "public_access=$public_access" >> "$GITHUB_OUTPUT"
+          echo "cloud_provider=$cloud_provider" >> "$GITHUB_OUTPUT"
+      - name: Print issue outputs
+        run: |
+          echo "cloud_provider='${{ steps.vars.outputs.cloud_provider }}'"
+          echo "bucket_name='${{ steps.vars.outputs.bucket_name }}'"
+          echo "region='${{ steps.vars.outputs.region }}'"
+          echo "environment='${{ steps.vars.outputs.environment }}'"
+          echo "public_access='${{ steps.vars.outputs.public_access }}'"
+      # ...rest of your original PR creation and notification steps...

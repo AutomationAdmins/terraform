@@ -1,0 +1,19 @@
+name: Bucket Request Awaiting Approval
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  wait-for-approval:
+    if: contains(github.event.issue.labels.*.name, 'infra-request')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Comment awaiting approval
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} \
+            --body "Thank you for your request. Waiting for admin approval. Please add the label `approved-by-admin` to proceed."
