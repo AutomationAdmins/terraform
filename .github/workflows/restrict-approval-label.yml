@@ -19,9 +19,16 @@ jobs:
             const adminTeam = 'admins'; // Change to your team name
             const org = context.repo.owner;
             const username = context.payload.sender.login;
-            const { data: teams } = await github.rest.teams.listForUser({ username });
-            const isAdmin = teams.some(team => team.organization.login === org && team.slug === adminTeam);
-            core.setOutput('is_admin', isAdmin);
+            try {
+              const { data: members } = await github.rest.teams.listMembersInOrg({
+                org,
+                team_slug: adminTeam,
+              });
+              const isAdmin = members.some(member => member.login === username);
+              core.setOutput('is_admin', isAdmin);
+            } catch (e) {
+              core.setOutput('is_admin', false);
+            }
       - name: Remove label and comment if not admin
         if: steps.check_admin.outputs.is_admin != 'true'
         env:
