@@ -6,7 +6,7 @@ on:
 
 jobs:
   bucket:
-    if: contains(github.event.issue.labels.*.name, 'infra-request') && github.event.label.name == 'approved-by-admin'
+    if: github.event.label.name == 'approved-by-admin'
     runs-on: ubuntu-latest
     permissions:
       contents: write
