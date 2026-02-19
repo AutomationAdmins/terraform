@@ -35,4 +35,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "approved-by-admin"
-          gh issue comment ${{ github.event.issue.number }} --body "Only admins can approve requests by adding the 'approved-by-admin' label."
+          gh issue comment ${{ github.event.issue.number }} --body "Only admins can approve requests by adding the \`approved-by-admin\` label."
