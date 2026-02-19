@@ -15,5 +15,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue comment ${{ github.event.issue.number }} \
-            --body "Thank you for your request. Waiting for admin approval. Please add the label `approved-by-admin` to proceed."
+          gh issue comment ${{ github.event.issue.number }} --body "Thank you for your request. Waiting for admin approval. Please add the label \`approved-by-admin\` to proceed."
