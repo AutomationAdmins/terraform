@@ -163,7 +163,7 @@ jobs:
 
       - name: Notify requestor - In Progress
         env:
-          GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue comment ${{ github.event.issue.number }} \
             --body "Your request is being processed. A PR has been created for your **${{ steps.vars.outputs.cloud_provider }}** bucket **${{ steps.vars.outputs.bucket_name }}**. Your bucket will be provisioned once the PR is reviewed and merged."
