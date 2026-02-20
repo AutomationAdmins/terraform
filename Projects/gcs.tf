@@ -24,3 +24,16 @@ resource "google_storage_bucket" "dev_dav" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "chumma_for_testing" {
+  name     = "chumma_for_testing"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "test"
+    owner = "selfservice"
+  }
+}
