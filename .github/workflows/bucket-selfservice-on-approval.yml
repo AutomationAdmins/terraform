@@ -131,7 +131,7 @@ jobs:
             --base automation \
             --head "$BRANCH_NAME" \
             --title "Self-service ${{ steps.vars.outputs.cloud_provider }} bucket: ${{ steps.vars.outputs.bucket_name }}-${{ github.run_id }}" \
-            --body "Provider: ${{ steps.vars.outputs.cloud_provider }} | Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }} | Issue: #${{ github.event.issue.number }}"
+            --body "Provider: ${{ steps.vars.outputs.cloud_provider }} | Bucket: ${{ steps.vars.outputs.bucket_name }} | Region: ${{ steps.vars.outputs.region }} | Env: ${{ steps.vars.outputs.environment }} | [Issue #${{ github.event.issue.number }}]"
 
           gh pr edit "$BRANCH_NAME" --add-label "ready-for-plan"
 
