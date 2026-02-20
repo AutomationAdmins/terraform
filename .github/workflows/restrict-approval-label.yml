@@ -11,6 +11,8 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Check if user is admin
         id: check_admin
         uses: actions/github-script@v7
