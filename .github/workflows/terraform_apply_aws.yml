@@ -48,6 +48,7 @@ jobs:
           COMMIT_MSG="${{ github.event.head_commit.message }}"
           ISSUE_NUM=$(echo "$COMMIT_MSG" | grep -oP '\[Issue #\K[0-9]+' || true)
           if [ -n "$ISSUE_NUM" ]; then
+            gh issue comment "$ISSUE_NUM" --body "Buckets created"
             gh issue comment "$ISSUE_NUM" \
               --body "Your bucket has been successfully provisioned! Terraform apply completed in run [#${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
             gh issue close "$ISSUE_NUM" --reason completed
