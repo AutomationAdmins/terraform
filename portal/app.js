@@ -164,10 +164,12 @@ function showApp() {
   userSection.classList.remove('hidden');
   formSection.classList.remove('hidden');
   requestsSection.classList.remove('hidden');
-
+  // Restore display for sections after login
+  if (userSection) userSection.style.display = '';
+  if (formSection) formSection.style.display = '';
+  if (requestsSection) requestsSection.style.display = '';
   $('#user-avatar').src = currentUser.avatar_url;
   $('#user-name').textContent = currentUser.login;
-
   // Always reload requests list when showing dashboard
   loadRecentRequests();
 }
