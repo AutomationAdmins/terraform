@@ -374,25 +374,32 @@ function renderRequestDetailPage(issueNumber) {
     try {
       const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
       const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
-      let html = `<button class="btn btn-outline btn-sm" id="back-to-dashboard">← Back to Dashboard</button>`;
-      html += `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
-      html += `<div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleString()}${issue.closed_at ? ' · Closed: ' + new Date(issue.closed_at).toLocaleString() : ''}</div>`;
-      html += `<div class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-bottom:1rem;">${issue.state}</div>`;
-      html += `<div class="activity-body" style="margin-bottom:1.2rem;">${issue.body.replace(/\n/g, '<br>')}</div>`;
-      html += `<div class="activity-feed"><strong>Activity Feed</strong>`;
+      // Modern attractive header
+      let html = `<div style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); border-radius: 14px 14px 0 0; padding: 1.2rem 2rem 1rem 2rem; color: #fff; margin:-1.75rem -1.75rem 1.5rem -1.75rem; display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-size:1.25rem; font-weight:700; letter-spacing:-0.5px;">${issue.title}</div>
+        <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="font-size:0.9rem; padding:6px 18px; background:#fff; color:${issue.state === 'open' ? 'var(--success)' : 'var(--danger)'}; border:none;">${issue.state.toUpperCase()}</span>
+      </div>`;
+      html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+        <div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleString()}${issue.closed_at ? ' · Closed: ' + new Date(issue.closed_at).toLocaleString() : ''}</div>
+        <button class="btn btn-outline btn-sm" id="back-to-dashboard">← Back to Dashboard</button>
+      </div>`;
+      html += `<hr style="border:none; border-top:1px solid var(--border); margin:0 0 1.2rem 0;">`;
+      html += `<div class="activity-body" style="margin-bottom:1.2rem; font-size:1.08rem; background:var(--bg-secondary); border-radius:8px; padding:1.1rem 1.3rem;">${issue.body.replace(/\n/g, '<br>')}</div>`;
+      html += `<hr style="border:none; border-top:1px solid var(--border); margin:1.2rem 0 1.2rem 0;">`;
+      html += `<div class="activity-feed"><strong style="font-size:1.08rem; color:var(--accent-purple)">Activity Feed</strong>`;
       if (comments.length === 0) {
         html += `<div class="activity-item"><span class="activity-meta">No comments yet.</span></div>`;
       } else {
         comments.forEach((c) => {
-          html += `<div class="activity-item">
-            <div class="activity-meta">${c.user.login} · ${new Date(c.created_at).toLocaleString()}</div>
-            <div class="activity-body">${c.body.replace(/\n/g, '<br>')}</div>
+          html += `<div class="activity-item" style="margin-bottom:1.2rem;">
+            <div class="activity-meta" style="font-size:0.92rem; color:var(--text-muted); margin-bottom:2px;">${c.user.login} · ${new Date(c.created_at).toLocaleString()}</div>
+            <div class="activity-body" style="background:var(--bg-secondary); border-radius:8px; padding:0.8rem 1.1rem; font-size:1rem;">${c.body.replace(/\n/g, '<br>')}</div>
           </div>`;
         });
       }
       html += `</div>`;
       if (issue.state === 'closed') {
-        html += `<div class="status-error" style="margin-top:1.5rem;">This request is <b>closed</b>. No further actions are possible.</div>`;
+        html += `<div class="status-error" style="margin-top:2rem; font-size:1.1rem; background:rgba(220,38,38,0.08); border-radius:8px; padding:1rem 1.2rem; color:var(--danger); text-align:center; font-weight:600;">This request is <b>closed</b>. No further actions are possible.</div>`;
       }
       detailPage.innerHTML = html;
       document.getElementById('back-to-dashboard').onclick = () => {
