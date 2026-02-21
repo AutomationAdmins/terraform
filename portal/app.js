@@ -370,14 +370,19 @@ function renderRequestDetailPage(issueNumber) {
   (async () => {
     try {
       const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
+      if (issue.state === 'closed') {
+        detailPage.innerHTML = `<div class="status-error">This request has been closed.<br><button class="btn btn-outline btn-sm" id="back-to-dashboard">Back to Dashboard</button></div>`;
+        document.getElementById('back-to-dashboard').onclick = () => {
+          window.location.hash = '';
+        };
+        return;
+      }
       const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
-
       let html = `<button class="btn btn-outline btn-sm" id="back-to-dashboard">← Back to Dashboard</button>`;
       html += `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
       html += `<div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleString()}${issue.closed_at ? ' · Closed: ' + new Date(issue.closed_at).toLocaleString() : ''}</div>`;
       html += `<div class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-bottom:1rem;">${issue.state}</div>`;
       html += `<div class="activity-body" style="margin-bottom:1.2rem;">${issue.body.replace(/\n/g, '<br>')}</div>`;
-
       html += `<div class="activity-feed"><strong>Activity Feed</strong>`;
       if (comments.length === 0) {
         html += `<div class="activity-item"><span class="activity-meta">No comments yet.</span></div>`;
@@ -390,15 +395,15 @@ function renderRequestDetailPage(issueNumber) {
         });
       }
       html += `</div>`;
-
       detailPage.innerHTML = html;
       document.getElementById('back-to-dashboard').onclick = () => {
-        window.history.pushState({}, '', window.location.pathname);
-        detailPage.classList.add('hidden');
-        showApp();
+        window.location.hash = '';
       };
     } catch (err) {
-      detailPage.innerHTML = `<div class="status-error">Failed to load details: ${err.message}</div>`;
+      detailPage.innerHTML = `<div class="status-error">Request not found or inaccessible.<br><button class="btn btn-outline btn-sm" id="back-to-dashboard">Back to Dashboard</button></div>`;
+      document.getElementById('back-to-dashboard').onclick = () => {
+        window.location.hash = '';
+      };
     }
   })();
 }
@@ -416,6 +421,8 @@ function handleRoute() {
   }
 }
 
+// Ensure correct view on initial load
+window.addEventListener('DOMContentLoaded', handleRoute);
 window.addEventListener('popstate', handleRoute);
 window.addEventListener('hashchange', handleRoute);
 
