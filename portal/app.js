@@ -148,38 +148,31 @@ async function ghAPI(endpoint, token = accessToken, options = {}) {
 
 function showLogin() {
   loginSection.classList.remove('hidden');
+  loginSection.style.display = '';
   userSection.classList.add('hidden');
+  userSection.style.display = 'none';
   formSection.classList.add('hidden');
+  formSection.style.display = 'none';
   requestsSection.classList.add('hidden');
+  requestsSection.style.display = 'none';
   statusSection.classList.add('hidden');
-  // Hide form and user section forcibly (class and style)
-  if (userSection) {
-    userSection.classList.add('hidden');
-    userSection.style.display = 'none';
-  }
-  if (formSection) {
-    formSection.classList.add('hidden');
-    formSection.style.display = 'none';
-  }
-  if (requestsSection) {
-    requestsSection.classList.add('hidden');
-    requestsSection.style.display = 'none';
-  }
+  statusSection.style.display = 'none';
   showPATLogin();
 }
 
 function showApp() {
   loginSection.classList.add('hidden');
+  loginSection.style.display = 'none';
   userSection.classList.remove('hidden');
+  userSection.style.display = '';
   formSection.classList.remove('hidden');
+  formSection.style.display = '';
   requestsSection.classList.remove('hidden');
-  // Restore display for sections after login
-  if (userSection) userSection.style.display = '';
-  if (formSection) formSection.style.display = '';
-  if (requestsSection) requestsSection.style.display = '';
+  requestsSection.style.display = '';
+  statusSection.classList.add('hidden');
+  statusSection.style.display = 'none';
   $('#user-avatar').src = currentUser.avatar_url;
   $('#user-name').textContent = currentUser.login;
-  // Always reload requests list when showing dashboard
   loadRecentRequests();
 }
 
