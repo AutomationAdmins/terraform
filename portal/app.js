@@ -265,7 +265,6 @@ _Submitted via Infra Self-Service Portal_`;
         <button class="btn btn-outline btn-sm" id="view-issue-btn" data-issue-number="${issue.number}">View Issue #${issue.number}</button>
       </p>
     `;
-    // Add click handler for the new button
     setTimeout(() => {
       const viewBtn = document.getElementById('view-issue-btn');
       if (viewBtn) {
