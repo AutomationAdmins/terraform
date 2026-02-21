@@ -152,10 +152,19 @@ function showLogin() {
   formSection.classList.add('hidden');
   requestsSection.classList.add('hidden');
   statusSection.classList.add('hidden');
-  // Hide form and user section forcibly
-  if (userSection) userSection.style.display = 'none';
-  if (formSection) formSection.style.display = 'none';
-  if (requestsSection) requestsSection.style.display = 'none';
+  // Hide form and user section forcibly (class and style)
+  if (userSection) {
+    userSection.classList.add('hidden');
+    userSection.style.display = 'none';
+  }
+  if (formSection) {
+    formSection.classList.add('hidden');
+    formSection.style.display = 'none';
+  }
+  if (requestsSection) {
+    requestsSection.classList.add('hidden');
+    requestsSection.style.display = 'none';
+  }
   showPATLogin();
 }
 
