@@ -25,3 +25,16 @@ resource "google_storage_bucket" "dev_log_data_567" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "first_dev_bucket" {
+  name     = "first-dev-bucket"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
