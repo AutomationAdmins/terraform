@@ -262,9 +262,18 @@ _Submitted via Infra Self-Service Portal_`;
     $('#status-message').innerHTML = `
       <p class="status-success">
         ✅ Request submitted successfully!<br />
-        <a href="${issue.html_url}" target="_blank">View Issue #${issue.number}</a>
+        <button class="btn btn-outline btn-sm" id="view-issue-btn" data-issue-number="${issue.number}">View Issue #${issue.number}</button>
       </p>
     `;
+    // Add click handler for the new button
+    setTimeout(() => {
+      const viewBtn = document.getElementById('view-issue-btn');
+      if (viewBtn) {
+        viewBtn.onclick = () => {
+          window.location.hash = `#/request/${issue.number}`;
+        };
+      }
+    }, 0);
 
     // Reset form
     $('#bucket-form').reset();
@@ -314,50 +323,53 @@ async function loadRecentRequests() {
       )
       .join('');
 
-    // Add click handlers for detailed view
+    // Add click handlers for detailed view (route-based)
     list.querySelectorAll('.request-item').forEach((item) => {
-      item.addEventListener('click', async (e) => {
+      item.addEventListener('click', (e) => {
         const issueNumber = item.getAttribute('data-issue-number');
-        await showRequestModal(issueNumber);
+        window.location.hash = `#/request/${issueNumber}`;
       });
     });
-  // ============================================================
-  // Request Detail Modal & Activity Feed
-  // ============================================================
-
-  const modal = document.getElementById('request-modal');
-  const closeModalBtn = document.getElementById('close-modal');
-  const modalBody = document.getElementById('modal-body');
-
-  if (closeModalBtn) {
-    closeModalBtn.onclick = () => {
-      modal.classList.add('hidden');
-      modalBody.innerHTML = '';
-    };
+  } catch {
+    $('#requests-list').innerHTML = '<p class="no-requests">Could not load requests</p>';
   }
+}
 
-  window.onclick = function(event) {
-    if (event.target === modal) {
-      modal.classList.add('hidden');
-      modalBody.innerHTML = '';
-    }
-  };
+// ============================================================
+// Request Detail Full Page View & Activity Feed (Client Routing)
+// ============================================================
 
-  async function showRequestModal(issueNumber) {
-    modal.classList.remove('hidden');
-    modalBody.innerHTML = '<div style="text-align:center"><span class="spinner"></span> Loading...</div>';
+const detailPageId = 'request-detail-page';
+
+function renderRequestDetailPage(issueNumber) {
+  // Hide all main sections
+  loginSection.classList.add('hidden');
+  userSection.classList.add('hidden');
+  formSection.classList.add('hidden');
+  requestsSection.classList.add('hidden');
+  statusSection.classList.add('hidden');
+
+  let detailPage = document.getElementById(detailPageId);
+  if (!detailPage) {
+    detailPage = document.createElement('div');
+    detailPage.id = detailPageId;
+    detailPage.className = 'card';
+    document.querySelector('.container').appendChild(detailPage);
+  }
+  detailPage.innerHTML = '<div style="text-align:center"><span class="spinner"></span> Loading...</div>';
+  detailPage.classList.remove('hidden');
+
+  (async () => {
     try {
-      // Fetch issue details
       const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
-      // Fetch comments
       const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
 
-      let html = `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
+      let html = `<button class="btn btn-outline btn-sm" id="back-to-dashboard">← Back to Dashboard</button>`;
+      html += `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
       html += `<div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleString()}${issue.closed_at ? ' · Closed: ' + new Date(issue.closed_at).toLocaleString() : ''}</div>`;
       html += `<div class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-bottom:1rem;">${issue.state}</div>`;
       html += `<div class="activity-body" style="margin-bottom:1.2rem;">${issue.body.replace(/\n/g, '<br>')}</div>`;
 
-      // Activity Feed
       html += `<div class="activity-feed"><strong>Activity Feed</strong>`;
       if (comments.length === 0) {
         html += `<div class="activity-item"><span class="activity-meta">No comments yet.</span></div>`;
@@ -371,15 +383,33 @@ async function loadRecentRequests() {
       }
       html += `</div>`;
 
-      modalBody.innerHTML = html;
+      detailPage.innerHTML = html;
+      document.getElementById('back-to-dashboard').onclick = () => {
+        window.history.pushState({}, '', window.location.pathname);
+        detailPage.classList.add('hidden');
+        showApp();
+      };
     } catch (err) {
-      modalBody.innerHTML = `<div class="status-error">Failed to load details: ${err.message}</div>`;
+      detailPage.innerHTML = `<div class="status-error">Failed to load details: ${err.message}</div>`;
     }
-  }
-  } catch {
-    $('#requests-list').innerHTML = '<p class="no-requests">Could not load requests</p>';
+  })();
+}
+
+function handleRoute() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#/request/')) {
+    const issueNumber = hash.split('/')[2];
+    renderRequestDetailPage(issueNumber);
+  } else {
+    // Show dashboard
+    const detailPage = document.getElementById(detailPageId);
+    if (detailPage) detailPage.classList.add('hidden');
+    showApp();
   }
 }
+
+window.addEventListener('popstate', handleRoute);
+window.addEventListener('hashchange', handleRoute);
 
 // ============================================================
 // Init
@@ -404,4 +434,7 @@ async function initApp() {
 }
 
 // Handle OAuth callback, then init
-handleOAuthCallback().then(() => initApp());
+handleOAuthCallback().then(() => {
+  initApp();
+  handleRoute();
+});
