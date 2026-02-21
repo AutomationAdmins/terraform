@@ -56,9 +56,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
         run: |
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          ISSUE_NUM=$(echo "$COMMIT_MSG" | grep -oP '\[Issue #\K[0-9]+' || true)
-          if [ -n "$ISSUE_NUM" ]; then
+          if [ -f .issue_number ]; then
+            ISSUE_NUM=$(cat .issue_number)
             gh issue comment "$ISSUE_NUM" --body "Buckets created"
             gh issue comment "$ISSUE_NUM" \
               --body "Your bucket has been successfully provisioned! Terraform apply completed in run [#${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
