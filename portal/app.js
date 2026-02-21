@@ -373,11 +373,12 @@ function renderRequestDetailPage(issueNumber) {
   (async () => {
     try {
       const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
+      // If closed, auto-redirect to dashboard
       if (issue.state === 'closed') {
-        detailPage.innerHTML = `<div class="status-error">This request has been closed.<br><button class="btn btn-outline btn-sm" id="back-to-dashboard">Back to Dashboard</button></div>`;
-        document.getElementById('back-to-dashboard').onclick = () => {
-          window.location.hash = '';
-        };
+        window.location.hash = '';
+        detailPage.classList.add('hidden');
+        showApp();
+        handleRoute();
         return;
       }
       const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
