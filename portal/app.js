@@ -152,6 +152,10 @@ function showLogin() {
   formSection.classList.add('hidden');
   requestsSection.classList.add('hidden');
   statusSection.classList.add('hidden');
+  // Hide form and user section forcibly
+  if (userSection) userSection.style.display = 'none';
+  if (formSection) formSection.style.display = 'none';
+  if (requestsSection) requestsSection.style.display = 'none';
   showPATLogin();
 }
 
