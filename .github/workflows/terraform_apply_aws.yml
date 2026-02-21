@@ -46,7 +46,15 @@ jobs:
           GH_TOKEN: ${{ secrets.INFRA_BOT_PAT }}
         run: |
           COMMIT_MSG="${{ github.event.head_commit.message }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
           ISSUE_NUM=$(echo "$COMMIT_MSG" | grep -oP '\[Issue #\K[0-9]+' || true)
+          if [ -z "$ISSUE_NUM" ]; then
+            ISSUE_NUM=$(echo "$PR_TITLE" | grep -oP '\[Issue #\K[0-9]+' || true)
+          fi
+          if [ -z "$ISSUE_NUM" ]; then
+            ISSUE_NUM=$(echo "$PR_BODY" | grep -oP '\[Issue #\K[0-9]+' || true)
+          fi
           if [ -n "$ISSUE_NUM" ]; then
             gh issue comment "$ISSUE_NUM" --body "Buckets created"
             gh issue comment "$ISSUE_NUM" \
