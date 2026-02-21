@@ -317,12 +317,21 @@ async function loadRecentRequests() {
             <div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleDateString()}</div>
           </div>
           <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
+          <button class="btn btn-outline btn-sm view-issue-btn" data-issue-number="${issue.number}" style="margin-left:12px;">View Issue</button>
         </div>
       `
       )
       .join('');
 
     // Add click handlers for detailed view (route-based)
+    list.querySelectorAll('.view-issue-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const issueNumber = btn.getAttribute('data-issue-number');
+        window.location.hash = `#/request/${issueNumber}`;
+      });
+    });
+    // Optionally, keep the item click for modal/other detail
     list.querySelectorAll('.request-item').forEach((item) => {
       item.addEventListener('click', (e) => {
         const issueNumber = item.getAttribute('data-issue-number');
