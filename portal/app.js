@@ -373,14 +373,6 @@ function renderRequestDetailPage(issueNumber) {
   (async () => {
     try {
       const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
-      // If closed, auto-redirect to dashboard
-      if (issue.state === 'closed') {
-        window.location.hash = '';
-        detailPage.classList.add('hidden');
-        showApp();
-        handleRoute();
-        return;
-      }
       const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
       let html = `<button class="btn btn-outline btn-sm" id="back-to-dashboard">← Back to Dashboard</button>`;
       html += `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
@@ -399,6 +391,9 @@ function renderRequestDetailPage(issueNumber) {
         });
       }
       html += `</div>`;
+      if (issue.state === 'closed') {
+        html += `<div class="status-error" style="margin-top:1.5rem;">This request is <b>closed</b>. No further actions are possible.</div>`;
+      }
       detailPage.innerHTML = html;
       document.getElementById('back-to-dashboard').onclick = () => {
         window.location.hash = '';
