@@ -563,6 +563,75 @@ body {
   font-size: 0.9rem;
 }
 
+/* ---- Modal ---- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 41, 59, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(30,41,59,0.18);
+  padding: 2rem 2.5rem 1.5rem;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  animation: modalIn 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes modalIn {
+  from { transform: translateY(40px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.close-modal {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.close-modal:hover {
+  color: var(--danger);
+}
+
+#modal-body {
+  margin-top: 0.5rem;
+}
+
+.modal .activity-feed {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.activity-item {
+  margin-bottom: 1.2rem;
+}
+.activity-meta {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+}
+.activity-body {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
 /* ---- Spinner ---- */
 .spinner {
   display: inline-block;

@@ -303,9 +303,9 @@ async function loadRecentRequests() {
     list.innerHTML = issues
       .map(
         (issue) => `
-        <div class="request-item">
+        <div class="request-item" data-issue-number="${issue.number}" style="cursor:pointer;">
           <div>
-            <div class="request-title"><a href="${issue.html_url}" target="_blank">${issue.title}</a></div>
+            <div class="request-title">${issue.title}</div>
             <div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleDateString()}</div>
           </div>
           <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
@@ -313,6 +313,69 @@ async function loadRecentRequests() {
       `
       )
       .join('');
+
+    // Add click handlers for detailed view
+    list.querySelectorAll('.request-item').forEach((item) => {
+      item.addEventListener('click', async (e) => {
+        const issueNumber = item.getAttribute('data-issue-number');
+        await showRequestModal(issueNumber);
+      });
+    });
+  // ============================================================
+  // Request Detail Modal & Activity Feed
+  // ============================================================
+
+  const modal = document.getElementById('request-modal');
+  const closeModalBtn = document.getElementById('close-modal');
+  const modalBody = document.getElementById('modal-body');
+
+  if (closeModalBtn) {
+    closeModalBtn.onclick = () => {
+      modal.classList.add('hidden');
+      modalBody.innerHTML = '';
+    };
+  }
+
+  window.onclick = function(event) {
+    if (event.target === modal) {
+      modal.classList.add('hidden');
+      modalBody.innerHTML = '';
+    }
+  };
+
+  async function showRequestModal(issueNumber) {
+    modal.classList.remove('hidden');
+    modalBody.innerHTML = '<div style="text-align:center"><span class="spinner"></span> Loading...</div>';
+    try {
+      // Fetch issue details
+      const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
+      // Fetch comments
+      const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
+
+      let html = `<h2 style="margin-bottom:0.5rem;">${issue.title}</h2>`;
+      html += `<div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleString()}${issue.closed_at ? ' · Closed: ' + new Date(issue.closed_at).toLocaleString() : ''}</div>`;
+      html += `<div class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-bottom:1rem;">${issue.state}</div>`;
+      html += `<div class="activity-body" style="margin-bottom:1.2rem;">${issue.body.replace(/\n/g, '<br>')}</div>`;
+
+      // Activity Feed
+      html += `<div class="activity-feed"><strong>Activity Feed</strong>`;
+      if (comments.length === 0) {
+        html += `<div class="activity-item"><span class="activity-meta">No comments yet.</span></div>`;
+      } else {
+        comments.forEach((c) => {
+          html += `<div class="activity-item">
+            <div class="activity-meta">${c.user.login} · ${new Date(c.created_at).toLocaleString()}</div>
+            <div class="activity-body">${c.body.replace(/\n/g, '<br>')}</div>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+
+      modalBody.innerHTML = html;
+    } catch (err) {
+      modalBody.innerHTML = `<div class="status-error">Failed to load details: ${err.message}</div>`;
+    }
+  }
   } catch {
     $('#requests-list').innerHTML = '<p class="no-requests">Could not load requests</p>';
   }
