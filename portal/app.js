@@ -163,6 +163,9 @@ function showApp() {
 
   $('#user-avatar').src = currentUser.avatar_url;
   $('#user-name').textContent = currentUser.login;
+
+  // Always reload requests list when showing dashboard
+  loadRecentRequests();
 }
 
 // ============================================================
@@ -398,11 +401,17 @@ function renderRequestDetailPage(issueNumber) {
       detailPage.innerHTML = html;
       document.getElementById('back-to-dashboard').onclick = () => {
         window.location.hash = '';
+        detailPage.classList.add('hidden');
+        showApp();
+        handleRoute();
       };
     } catch (err) {
       detailPage.innerHTML = `<div class="status-error">Request not found or inaccessible.<br><button class="btn btn-outline btn-sm" id="back-to-dashboard">Back to Dashboard</button></div>`;
       document.getElementById('back-to-dashboard').onclick = () => {
         window.location.hash = '';
+        detailPage.classList.add('hidden');
+        showApp();
+        handleRoute();
       };
     }
   })();
@@ -418,6 +427,7 @@ function handleRoute() {
     const detailPage = document.getElementById(detailPageId);
     if (detailPage) detailPage.classList.add('hidden');
     showApp();
+    handleRoute();
   }
 }
 
