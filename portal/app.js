@@ -435,7 +435,17 @@ function handleRoute() {
 }
 
 // Ensure correct view on initial load
-window.addEventListener('DOMContentLoaded', handleRoute);
+window.addEventListener('DOMContentLoaded', () => {
+  // Hide modal overlay on load
+  const modal = document.getElementById('request-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    modal.style.pointerEvents = 'none';
+    modal.style.opacity = 0;
+  }
+  handleRoute();
+});
 window.addEventListener('popstate', handleRoute);
 window.addEventListener('hashchange', handleRoute);
 
