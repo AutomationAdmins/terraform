@@ -157,6 +157,21 @@ function showLogin() {
   requestsSection.style.display = 'none';
   statusSection.classList.add('hidden');
   statusSection.style.display = 'none';
+  // Also forcibly hide form and requests in case showPATLogin() or other code mutates DOM
+  setTimeout(() => {
+    if (formSection) {
+      formSection.classList.add('hidden');
+      formSection.style.display = 'none';
+    }
+    if (requestsSection) {
+      requestsSection.classList.add('hidden');
+      requestsSection.style.display = 'none';
+    }
+    if (userSection) {
+      userSection.classList.add('hidden');
+      userSection.style.display = 'none';
+    }
+  }, 0);
   showPATLogin();
 }
 
