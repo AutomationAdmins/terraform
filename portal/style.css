@@ -758,3 +758,10 @@ footer {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* --- Force modal to be hidden unless explicitly shown --- */
+.modal.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
