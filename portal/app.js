@@ -423,7 +423,8 @@ function handleRoute() {
     const detailPage = document.getElementById(detailPageId);
     if (detailPage) detailPage.classList.add('hidden');
     showApp();
-    handleRoute();
+    // Always reload recent requests to update status after refresh or navigation
+    loadRecentRequests();
   }
 }
 
