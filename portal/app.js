@@ -335,18 +335,18 @@ async function loadRecentRequests() {
       return;
     }
 
-      list.innerHTML = issues
-        .map(
-          (issue) => `
-          <div class="request-item" data-issue-number="${issue.number}" style="cursor:pointer;">
-            <a class="request-link" href="#/request/${issue.number}">
-              #${issue.number} — ${issue.title}
-            </a>
-            <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-left:8px;">${issue.state}</span>
-          </div>
-        `
-        )
-        .join('');
+        list.innerHTML = issues
+          .map(
+            (issue) => `
+            <div class="request-item" data-issue-number="${issue.number}" style="cursor:pointer;">
+              <a class="request-link" href="#/request/${issue.number}">
+                Request number #${issue.number} — ${issue.title}
+              </a>
+              <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-left:8px;">${issue.state}</span>
+            </div>
+          `
+          )
+          .join('');
 
     // Add click handlers for detailed view (route-based)
     list.querySelectorAll('.view-issue-btn').forEach((btn) => {
