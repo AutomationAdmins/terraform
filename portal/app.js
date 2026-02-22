@@ -190,6 +190,23 @@ async function showApp() {
       await loadRecentRequests();
     };
   }
+
+  // Add search ticket handler
+  const searchBtn = document.getElementById('search-ticket-btn');
+  const searchInput = document.getElementById('search-ticket-input');
+  if (searchBtn && searchInput) {
+    searchBtn.onclick = () => {
+      const ticketNum = searchInput.value.trim();
+      if (ticketNum) {
+        window.location.hash = `#/request/${ticketNum}`;
+      }
+    };
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        searchBtn.click();
+      }
+    });
+  }
 }
 
 // ============================================================
