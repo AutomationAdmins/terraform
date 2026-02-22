@@ -165,7 +165,14 @@ function showApp() {
   $('#user-name').textContent = currentUser.login;
 
   // Always reload requests list when showing dashboard
-  loadRecentRequests();
+    loadRecentRequests();
+    // Add manual refresh button handler
+    const refreshBtn = document.getElementById('refresh-requests-btn');
+    if (refreshBtn) {
+      refreshBtn.onclick = () => {
+        loadRecentRequests();
+      };
+    }
 }
 
 // ============================================================
