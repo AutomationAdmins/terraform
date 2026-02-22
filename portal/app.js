@@ -457,6 +457,21 @@ async function initApp() {
 
 // Handle OAuth callback, then init
 handleOAuthCallback().then(() => {
-  initApp();
-  handleRoute();
+  if (!accessToken) {
+    showLogin();
+    return;
+  }
+  currentUser = null;
+  ghAPI('/user')
+    .then((user) => {
+      currentUser = user;
+      // Always restore the correct view based on the hash
+      handleRoute();
+    })
+    .catch(() => {
+      // Token expired or invalid
+      localStorage.removeItem('gh_token');
+      accessToken = null;
+      showLogin();
+    });
 });
