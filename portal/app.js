@@ -325,7 +325,7 @@ _Submitted via Infra Self-Service Portal_`;
 async function loadRecentRequests() {
   try {
     const issues = await ghAPI(
-      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=10&state=all`
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=30&state=all`
     );
 
     const list = $('#requests-list');
@@ -342,6 +342,7 @@ async function loadRecentRequests() {
           <div>
             <div class="request-title">${issue.title}</div>
             <div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleDateString()}</div>
+            <div class="request-body" style="margin-top:0.5rem; color:#555; font-size:0.95em;">${issue.body ? issue.body.substring(0, 200).replace(/\n/g, '<br>') : ''}${issue.body && issue.body.length > 200 ? '... <em>(truncated)</em>' : ''}</div>
           </div>
           <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
           <button class="btn btn-outline btn-sm view-issue-btn" data-issue-number="${issue.number}" style="margin-left:12px;">View Issue</button>
