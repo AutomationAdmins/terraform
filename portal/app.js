@@ -335,21 +335,18 @@ async function loadRecentRequests() {
       return;
     }
 
-    list.innerHTML = issues
-      .map(
-        (issue) => `
-        <div class="request-item" data-issue-number="${issue.number}" style="cursor:pointer;">
-          <div>
-            <div class="request-title">${issue.title}</div>
-            <div class="request-meta">#${issue.number} · ${new Date(issue.created_at).toLocaleDateString()}</div>
-            <div class="request-body" style="margin-top:0.5rem; color:#555; font-size:0.95em;">${issue.body ? issue.body.substring(0, 200).replace(/\n/g, '<br>') : ''}${issue.body && issue.body.length > 200 ? '... <em>(truncated)</em>' : ''}</div>
+      list.innerHTML = issues
+        .map(
+          (issue) => `
+          <div class="request-item" data-issue-number="${issue.number}" style="cursor:pointer;">
+            <a class="request-link" href="#/request/${issue.number}">
+              #${issue.number} — ${issue.title}
+            </a>
+            <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}" style="margin-left:8px;">${issue.state}</span>
           </div>
-          <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
-          <button class="btn btn-outline btn-sm view-issue-btn" data-issue-number="${issue.number}" style="margin-left:12px;">View Issue</button>
-        </div>
-      `
-      )
-      .join('');
+        `
+        )
+        .join('');
 
     // Add click handlers for detailed view (route-based)
     list.querySelectorAll('.view-issue-btn').forEach((btn) => {
