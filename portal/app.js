@@ -155,24 +155,41 @@ function showLogin() {
   showPATLogin();
 }
 
-function showApp() {
+async function showApp() {
   loginSection.classList.add('hidden');
   userSection.classList.remove('hidden');
   formSection.classList.remove('hidden');
   requestsSection.classList.remove('hidden');
 
+  // Always fetch user before loading requests
+  if (!currentUser) {
+    try {
+      currentUser = await ghAPI('/user');
+    } catch {
+      showLogin();
+      return;
+    }
+  }
   $('#user-avatar').src = currentUser.avatar_url;
   $('#user-name').textContent = currentUser.login;
 
-  // Always reload requests list when showing dashboard
-    loadRecentRequests();
-    // Add manual refresh button handler
-    const refreshBtn = document.getElementById('refresh-requests-btn');
-    if (refreshBtn) {
-      refreshBtn.onclick = () => {
-        loadRecentRequests();
-      };
-    }
+  await loadRecentRequests();
+  // Add manual refresh button handler
+  const refreshBtn = document.getElementById('refresh-requests-btn');
+  if (refreshBtn) {
+    refreshBtn.onclick = async () => {
+      // Always fetch user before loading requests on refresh
+      if (!currentUser) {
+        try {
+          currentUser = await ghAPI('/user');
+        } catch {
+          showLogin();
+          return;
+        }
+      }
+      await loadRecentRequests();
+    };
+  }
 }
 
 // ============================================================
@@ -452,8 +469,7 @@ async function initApp() {
 
   try {
     currentUser = await ghAPI('/user');
-    showApp();
-    await loadRecentRequests();
+    await showApp();
   } catch {
     // Token expired or invalid
     localStorage.removeItem('gh_token');
