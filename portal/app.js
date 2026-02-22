@@ -308,7 +308,7 @@ _Submitted via Infra Self-Service Portal_`;
 async function loadRecentRequests() {
   try {
     const issues = await ghAPI(
-      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&creator=${currentUser.login}&per_page=10&state=all`
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=10&state=all`
     );
 
     const list = $('#requests-list');
