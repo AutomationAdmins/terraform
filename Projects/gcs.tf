@@ -77,3 +77,16 @@ resource "google_storage_bucket" "ir_bucket_demo" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "testing_01_bucket_10323" {
+  name     = "testing-01-bucket-10323"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
