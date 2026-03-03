@@ -90,3 +90,16 @@ resource "google_storage_bucket" "testing_01_bucket_10323" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "my_first_demo_bucket" {
+  name     = "my-first-demo-bucket"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
