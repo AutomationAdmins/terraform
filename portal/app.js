@@ -158,11 +158,80 @@ function showLogin() {
 function showApp() {
   loginSection.classList.add('hidden');
   userSection.classList.remove('hidden');
-  formSection.classList.remove('hidden');
-  requestsSection.classList.remove('hidden');
+  serviceSection.classList.remove('hidden');
+  formSection.classList.add('hidden');
+  requestsSection.classList.add('hidden');
 
   $('#user-avatar').src = currentUser.avatar_url;
   $('#user-name').textContent = currentUser.login;
+}
+
+// ---- Service Request UI ----
+const serviceSection = document.getElementById('service-section');
+const serviceList = document.getElementById('service-list');
+const providerBtns = [
+  document.getElementById('provider-aws'),
+  document.getElementById('provider-gcp'),
+];
+
+const SERVICES = {
+  AWS: [
+    { name: 'Bucket', enabled: true },
+    { name: 'EC2', enabled: false },
+    { name: 'Lambda', enabled: false },
+    { name: 'RDS', enabled: false },
+    { name: 'DynamoDB', enabled: false },
+    { name: 'S3', enabled: false },
+    { name: 'CloudFront', enabled: false },
+    { name: 'ECS', enabled: false },
+    { name: 'SNS', enabled: false },
+    { name: 'SQS', enabled: false },
+  ],
+  GCP: [
+    { name: 'Bucket', enabled: true },
+    { name: 'Compute Engine', enabled: false },
+    { name: 'Cloud Functions', enabled: false },
+    { name: 'Cloud SQL', enabled: false },
+    { name: 'BigQuery', enabled: false },
+    { name: 'Pub/Sub', enabled: false },
+    { name: 'Cloud Run', enabled: false },
+    { name: 'Firestore', enabled: false },
+    { name: 'App Engine', enabled: false },
+    { name: 'Spanner', enabled: false },
+  ],
+};
+
+providerBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const provider = btn.dataset.provider;
+    showServices(provider);
+  });
+});
+
+function showServices(provider) {
+  serviceList.classList.remove('hidden');
+  serviceList.innerHTML = `<div class="service-grid">${SERVICES[provider].map(s => `
+    <button class="service-btn${s.enabled ? '' : ' disabled'}" ${s.enabled ? '' : 'disabled'} data-service="${s.name}">${s.name}</button>
+  `).join('')}</div>`;
+  // Only allow Bucket to proceed
+  serviceList.querySelectorAll('.service-btn').forEach(btn => {
+    if (btn.dataset.service === 'Bucket' && !btn.disabled) {
+      btn.addEventListener('click', () => {
+        serviceSection.classList.add('hidden');
+        formSection.classList.remove('hidden');
+        // Pre-select provider in hidden field
+        document.getElementById('cloud_provider').value = provider;
+        // Trigger region dropdown population
+        document.getElementById('cloud_provider').dispatchEvent(new Event('change'));
+        // Show back button
+        document.getElementById('back-to-provider').style.display = '';
+        document.getElementById('back-to-provider').onclick = function() {
+          formSection.classList.add('hidden');
+          serviceSection.classList.remove('hidden');
+        };
+      });
+    }
+  });
 }
 
 // ============================================================
@@ -332,6 +401,8 @@ async function initApp() {
     currentUser = await ghAPI('/user');
     showApp();
     await loadRecentRequests();
+    // Show requests on service-section
+    document.getElementById('requests-section').classList.remove('hidden');
   } catch {
     // Token expired or invalid
     localStorage.removeItem('gh_token');

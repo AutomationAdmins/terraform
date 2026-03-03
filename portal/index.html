@@ -18,7 +18,7 @@
     <nav class="navbar">
       <div class="nav-brand">
         <div class="logo">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="url(#cloud-grad)"/>
             <defs><linearGradient id="cloud-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
           </svg>
@@ -86,17 +86,47 @@
 
     <!-- User Info -->
     <div id="user-section" class="card hidden">
-      <div class="user-bar">
-        <div class="user-info">
-          <img id="user-avatar" src="" alt="avatar" class="avatar" />
-          <div>
-            <span id="user-name" class="user-name-text"></span>
-            <span class="user-role">Developer</span>
+        <div class="user-bar">
+          <div class="user-info">
+            <img id="user-avatar" src="" alt="avatar" class="avatar" />
+            <div>
+              <span id="user-name" class="user-name-text"></span>
+              <span class="user-role">Developer</span>
+            </div>
           </div>
+          <button id="logout-btn" class="btn btn-sm btn-outline">Sign out</button>
         </div>
-        <button id="logout-btn" class="btn btn-sm btn-outline">Sign out</button>
-      </div>
     </div>
+
+      <!-- Service Request Section -->
+      <div id="service-section" class="card hidden">
+        <div class="card-title-row">
+          <h2>Service Request</h2>
+        </div>
+        <div class="service-subtitle" style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.05rem; text-align: center;">
+          Kindly select the appropriate provider to provision the resource
+        </div>
+        <div class="provider-select-row stylish-provider-row">
+          <button class="provider-btn stylish-provider-btn" id="provider-aws" data-provider="AWS">
+            <span class="provider-icon aws-icon"></span>
+            <span class="provider-label">AWS</span>
+          </button>
+          <button class="provider-btn stylish-provider-btn" id="provider-gcp" data-provider="GCP">
+            <span class="provider-icon gcp-icon"></span>
+            <span class="provider-label">GCP</span>
+          </button>
+        </div>
+        <div id="service-list" class="service-list hidden"></div>
+        <div style="height: 48px;"></div>
+        <!-- Recent Requests -->
+        <div id="requests-section" class="card stylish-requests-card">
+          <div class="card-title-row">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <h2>Recent Requests</h2>
+          </div>
+          <div id="requests-list"></div>
+        </div>
+      </div>
 
     <!-- Request Form -->
     <div id="form-section" class="card hidden">
@@ -105,31 +135,8 @@
         <h2>New Bucket Request</h2>
       </div>
       <form id="bucket-form">
-        <!-- Provider Selection Cards -->
-        <div class="form-group">
-          <label>Cloud Provider <span class="required">*</span></label>
-          <div class="provider-cards">
-            <label class="provider-card" data-provider="AWS">
-              <input type="radio" name="cloud_provider_radio" value="AWS" required />
-              <div class="provider-card-inner">
-                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9900" d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576a.37.37 0 0 1 .064.2c0 .084-.048.168-.152.252l-.504.336a.382.382 0 0 1-.208.076c-.08 0-.16-.04-.24-.112a2.47 2.47 0 0 1-.288-.376 6.18 6.18 0 0 1-.248-.472c-.624.736-1.408 1.104-2.352 1.104-.672 0-1.208-.192-1.6-.576-.392-.384-.592-.896-.592-1.536 0-.68.24-1.232.728-1.648s1.136-.624 1.96-.624c.272 0 .552.024.848.064.296.04.6.104.92.176v-.584c0-.608-.128-1.032-.384-1.28-.264-.248-.704-.368-1.328-.368-.288 0-.584.032-.888.104-.304.072-.6.168-.888.28a2.13 2.13 0 0 1-.272.12.47.47 0 0 1-.12.02c-.168 0-.252-.12-.252-.368v-.392c0-.192.024-.336.08-.424a.826.826 0 0 1 .328-.236c.288-.144.632-.264 1.032-.36a5.09 5.09 0 0 1 1.272-.152c.968 0 1.676.22 2.128.66.448.44.676 1.108.676 2.008v2.64zm-3.24 1.2c.264 0 .536-.048.824-.144.288-.096.544-.272.76-.52a1.27 1.27 0 0 0 .316-.592c.056-.208.088-.456.088-.744v-.36a6.76 6.76 0 0 0-.736-.136 6.02 6.02 0 0 0-.752-.048c-.536 0-.928.104-1.184.32-.256.216-.38.528-.38.936 0 .384.096.672.296.864.192.2.48.296.864.296l-.096.128zm6.392.936c-.216 0-.36-.04-.44-.12-.08-.072-.152-.232-.208-.44l-2.32-7.632a1.97 1.97 0 0 1-.088-.464c0-.184.092-.288.272-.288h.784c.228 0 .38.04.456.12.084.072.148.232.204.44l1.66 6.54 1.54-6.54c.048-.216.112-.368.196-.44.084-.072.244-.12.464-.12h.64c.228 0 .384.04.464.12.08.072.152.224.196.44l1.56 6.62 1.712-6.62c.056-.216.124-.368.204-.44.084-.072.236-.12.456-.12h.744c.18 0 .28.096.28.288 0 .056-.008.12-.024.192a1.86 1.86 0 0 1-.064.28l-2.384 7.632c-.056.216-.128.368-.208.44-.08.072-.232.12-.44.12h-.688c-.228 0-.38-.04-.464-.12-.08-.08-.148-.232-.192-.448L14.74 5.68l-1.532 6.36c-.048.224-.112.376-.192.448-.08.08-.24.12-.464.12h-.688z"/><path fill="#FF9900" d="M21.384 13.248c-2.16 1.596-5.292 2.444-7.992 2.444-3.78 0-7.188-1.4-9.768-3.724-.204-.184-.024-.436.22-.292 2.784 1.62 6.228 2.596 9.78 2.596 2.4 0 5.04-.496 7.464-1.528.364-.164.672.24.296.504z"/><path fill="#FF9900" d="M22.232 12.252c-.276-.356-1.828-.168-2.528-.084-.212.024-.244-.16-.052-.296 1.236-.868 3.264-.616 3.5-.328.24.296-.064 2.332-1.224 3.308-.18.148-.348.068-.268-.128.26-.648.848-2.108.572-2.472z"/></svg>
-                <span>AWS</span>
-              </div>
-            </label>
-            <label class="provider-card" data-provider="GCP">
-              <input type="radio" name="cloud_provider_radio" value="GCP" required />
-              <div class="provider-card-inner">
-                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4285F4" d="M12.65 4.05h4.78l-1.57 1.57-.58 2.66h2.21l-3.61 5.48h1.56l-5.13 6.19 1.96-4.62H10.3l2.35-5.84h-2.2z"/><path fill="#34A853" d="M7.33 12.64l-1.57 1.57-.58 2.66h2.21L3.78 22.35h1.56L.21 28.54l1.96-4.62H.2l2.35-5.84h-2.2l2.43-6.01h4.78" opacity="0"/><path fill="#4285F4" d="M14.2 2.5L12 4.7l.65-.65h-1.3A7.5 7.5 0 0 0 4.7 12l-2.2 2.2A9.99 9.99 0 0 1 12 2z"/><path fill="#FBBC05" d="M22 12c0 1.77-.46 3.43-1.27 4.88l-2.2-2.2A7.49 7.49 0 0 0 19.5 12c0-.97-.18-1.9-.52-2.75l2.2-2.2C21.85 8.74 22 10 22 12z" opacity="0.9"/><circle cx="12" cy="12" r="3.5" fill="#4285F4"/><path fill="#34A853" d="M12 22a9.96 9.96 0 0 1-7.73-3.65l2.2-2.2A7.48 7.48 0 0 0 12 19.5c1.4 0 2.7-.38 3.82-1.05l2.2 2.2A9.96 9.96 0 0 1 12 22z" opacity="0.9"/><path fill="#EA4335" d="M5.25 7.05A7.47 7.47 0 0 0 4.5 12c0 1.28.32 2.49.88 3.55l-2.2 2.2A9.95 9.95 0 0 1 2 12c0-2.15.68-4.14 1.83-5.77l2.2 2.2C5.7 8.08 5.44 8 5.25 7.05z" opacity="0.9"/></svg>
-                <span>GCP</span>
-              </div>
-            </label>
-          </div>
-          <select id="cloud_provider" class="hidden" required>
-            <option value="">Select provider...</option>
-            <option value="GCP">GCP</option>
-            <option value="AWS">AWS</option>
-          </select>
-        </div>
+        <!-- Hidden Provider Field -->
+        <input type="hidden" id="cloud_provider" name="cloud_provider" />
 
         <div class="form-row">
           <div class="form-group">
@@ -170,7 +177,10 @@
           <textarea id="justification" rows="3" placeholder="Describe why you need this bucket..."></textarea>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+          <button type="button" id="back-to-provider" class="btn btn-outline stylish-back-btn">
+            ← Back to Provider Selection
+          </button>
           <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Submit Request
