@@ -51,3 +51,16 @@ resource "google_storage_bucket" "nainar_maheswari_dev_bucket" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "testing_12_bucket_123" {
+  name     = "testing-12-bucket-123"
+  location = "us-central1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
