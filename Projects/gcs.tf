@@ -64,3 +64,16 @@ resource "google_storage_bucket" "testing_12_bucket_123" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "ir_bucket_demo" {
+  name     = "ir-bucket-demo"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
