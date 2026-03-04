@@ -129,3 +129,16 @@ resource "google_storage_bucket" "this_is_my_bucket_2921019019" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "unique_system_bucket_1034343" {
+  name     = "unique-system-bucket-1034343"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
