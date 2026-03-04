@@ -116,3 +116,16 @@ resource "google_storage_bucket" "testing_01_3234343" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "this_is_my_bucket_2921019019" {
+  name     = "this-is-my-bucket-2921019019"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
