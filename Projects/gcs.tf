@@ -142,3 +142,16 @@ resource "google_storage_bucket" "unique_system_bucket_1034343" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "one_last_2923929296" {
+  name     = "one-last-2923929296"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
