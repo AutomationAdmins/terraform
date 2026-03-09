@@ -207,3 +207,16 @@ resource "google_storage_bucket" "my_first_system_10143_g" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "my_system_ap_1054673" {
+  name     = "my-system-ap-1054673"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
