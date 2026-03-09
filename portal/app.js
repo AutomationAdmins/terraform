@@ -417,6 +417,29 @@ async function loadRecentRequests() {
         openTicketModal(num);
       });
     });
+
+    // --- Ticket controls logic ---
+    const ticketInput = document.getElementById('ticket-number-input');
+    const openBtn = document.getElementById('open-ticket-btn');
+    const refreshBtn = document.getElementById('refresh-tickets-btn');
+    if (openBtn && ticketInput) {
+      openBtn.onclick = () => {
+        const val = ticketInput.value.trim();
+        if (val && !isNaN(val) && Number(val) > 0) {
+          openTicketModal(val);
+        } else {
+          ticketInput.focus();
+          ticketInput.classList.add('input-error');
+          setTimeout(() => ticketInput.classList.remove('input-error'), 1200);
+        }
+      };
+      ticketInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') openBtn.click();
+      });
+    }
+    if (refreshBtn) {
+      refreshBtn.onclick = () => loadRecentRequests();
+    }
   } catch {
     $('#requests-list').innerHTML = '<p class="no-requests">Could not load requests</p>';
   }
