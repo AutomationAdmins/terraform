@@ -79,6 +79,10 @@ jobs:
           REGION="${{ steps.vars.outputs.region }}"
           ENV="${{ steps.vars.outputs.environment }}"
           PROVIDER="${{ steps.vars.outputs.cloud_provider }}"
+          UNIQUE_SUFFIX="${GITHUB_RUN_ID}"
+          if [ "$PROVIDER" = "GCP" ]; then
+            BUCKET="${BUCKET}-${UNIQUE_SUFFIX}"
+          fi
           SAFE_NAME=$(echo "$BUCKET" | tr '-' '_')
 
           if [ "$PROVIDER" = "AWS" ]; then
