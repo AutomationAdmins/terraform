@@ -15,6 +15,13 @@ const formSection = $('#form-section');
 const statusSection = $('#status-section');
 const requestsSection = $('#requests-section');
 
+function showSyncStatus(message, isError = false) {
+  if (!statusSection) return;
+  statusSection.classList.remove('hidden');
+  const cls = isError ? 'status-error' : 'status-success';
+  $('#status-message').innerHTML = `<p class="${cls}">${message}</p>`;
+}
+
 // ============================================================
 // GitHub OAuth (Device Flow is not available for static sites,
 // so we use the standard OAuth web flow)
@@ -354,7 +361,11 @@ _Submitted via Infra Self-Service Portal_`;
 
     // Optimistically show the newly created issue in the list, then refresh in background
     prependIssueToList(issue);
-    loadRecentRequests().catch(() => {});
+    loadRecentRequests().then((ok) => {
+      if (!ok) {
+        showSyncStatus('Request created, but recent list sync failed. Check token/repo access.', true);
+      }
+    });
   } catch (err) {
     statusSection.classList.remove('hidden');
     $('#status-message').innerHTML = `
@@ -370,24 +381,105 @@ _Submitted via Infra Self-Service Portal_`;
 // Load recent requests
 // ============================================================
 
-async function loadRecentRequests() {
-  try {
-    // Try creator-filtered query first; if empty, fall back to label-only
-    let issues = await ghAPI(
-      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&creator=${currentUser.login}&per_page=10&state=all`
-    );
+function bindTicketControls() {
+  const ticketInput = document.getElementById('ticket-number-input');
+  const openBtn = document.getElementById('open-ticket-btn');
+  const refreshBtn = document.getElementById('refresh-tickets-btn');
 
-    if (!issues || issues.length === 0) {
-      issues = await ghAPI(
-        `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=10&state=all`
-      );
+  if (openBtn && ticketInput) {
+    openBtn.onclick = () => {
+      const val = ticketInput.value.trim();
+      if (val && !isNaN(val) && Number(val) > 0) {
+        openTicketModal(val);
+      } else {
+        ticketInput.focus();
+        ticketInput.classList.add('input-error');
+        setTimeout(() => ticketInput.classList.remove('input-error'), 1200);
+      }
+    };
+
+    if (!ticketInput.dataset.boundEnter) {
+      ticketInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') openBtn.click();
+      });
+      ticketInput.dataset.boundEnter = 'true';
+    }
+  }
+
+  if (refreshBtn) {
+    refreshBtn.onclick = async () => {
+      refreshBtn.disabled = true;
+      const previousText = refreshBtn.textContent;
+      refreshBtn.textContent = 'Refreshing...';
+      try {
+        const ok = await loadRecentRequests();
+        if (ok) {
+          showSyncStatus('Recent requests synced successfully.');
+        } else {
+          showSyncStatus('Could not sync recent requests. Check token/repo access.', true);
+        }
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = previousText || 'Refresh Requests';
+      }
+    };
+  }
+}
+
+async function loadRecentRequests() {
+  const list = $('#requests-list');
+  try {
+    if (!list) {
+      showSyncStatus('Recent requests panel not found in page.', true);
+      return false;
     }
 
-    const list = $('#requests-list');
+    if (!currentUser || !currentUser.login) {
+      throw new Error('Not authenticated with GitHub');
+    }
+
+    const nonce = Date.now();
+
+    // Build a robust list: creator issues + labeled issues.
+    // This prevents missing tickets when labels are not attached immediately.
+    const creatorLabeled = await ghAPI(
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&creator=${currentUser.login}&per_page=20&state=all&sort=created&direction=desc&t=${nonce}`
+    );
+
+    const creatorAll = await ghAPI(
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?creator=${currentUser.login}&per_page=30&state=all&sort=created&direction=desc&t=${nonce}`
+    );
+
+    const labeledAll = await ghAPI(
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=20&state=all&sort=created&direction=desc&t=${nonce}`
+    );
+
+    const isPortalRequest = (issue) => {
+      const title = (issue.title || '').toLowerCase();
+      const body = (issue.body || '').toLowerCase();
+      const labels = (issue.labels || []).map((l) => (l.name || '').toLowerCase());
+      return (
+        labels.includes((CONFIG.ISSUE_LABEL || '').toLowerCase()) ||
+        title.startsWith('[bucket request]:') ||
+        body.includes('submitted via infra self-service portal')
+      );
+    };
+
+    const mergedMap = new Map();
+    [...creatorLabeled, ...creatorAll, ...labeledAll].forEach((issue) => {
+      if (issue && issue.number) {
+        mergedMap.set(issue.number, issue);
+      }
+    });
+
+    const issues = Array.from(mergedMap.values())
+      .filter(isPortalRequest)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 10);
 
     if (!issues || issues.length === 0) {
       list.innerHTML = '<p class="no-requests">No requests yet</p>';
-      return;
+      return true;
     }
 
     list.innerHTML = issues
@@ -418,30 +510,12 @@ async function loadRecentRequests() {
       });
     });
 
-    // --- Ticket controls logic ---
-    const ticketInput = document.getElementById('ticket-number-input');
-    const openBtn = document.getElementById('open-ticket-btn');
-    const refreshBtn = document.getElementById('refresh-tickets-btn');
-    if (openBtn && ticketInput) {
-      openBtn.onclick = () => {
-        const val = ticketInput.value.trim();
-        if (val && !isNaN(val) && Number(val) > 0) {
-          openTicketModal(val);
-        } else {
-          ticketInput.focus();
-          ticketInput.classList.add('input-error');
-          setTimeout(() => ticketInput.classList.remove('input-error'), 1200);
-        }
-      };
-      ticketInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') openBtn.click();
-      });
+    return true;
+  } catch (err) {
+    if (list) {
+      list.innerHTML = `<p class="no-requests">Could not load requests: ${err.message || 'Unknown error'}</p>`;
     }
-    if (refreshBtn) {
-      refreshBtn.onclick = () => loadRecentRequests();
-    }
-  } catch {
-    $('#requests-list').innerHTML = '<p class="no-requests">Could not load requests</p>';
+    return false;
   }
 }
 
@@ -707,6 +781,7 @@ async function initApp() {
   try {
     currentUser = await ghAPI('/user');
     showApp();
+    bindTicketControls();
     await loadRecentRequests();
     // Show requests on service-section
     document.getElementById('requests-section').classList.remove('hidden');

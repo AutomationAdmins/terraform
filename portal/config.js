@@ -8,7 +8,7 @@ const CONFIG = {
   GITHUB_CLIENT_ID: 'YOUR_CLIENT_ID_HERE',
 
   // Your GitHub repo where issues will be created
-  REPO_OWNER: 'adminran',
+  REPO_OWNER: 'AutomationAdmins',
   REPO_NAME: 'terraform',
 
   // Issue label that triggers the self-service bot
