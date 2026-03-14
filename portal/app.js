@@ -426,6 +426,50 @@ function bindTicketControls() {
   }
 }
 
+function deriveTicketStatus(issue) {
+  if (!issue) return { text: 'open', className: 'badge-open', tone: 'open' };
+  if (issue.state === 'closed') {
+    return { text: 'closed', className: 'badge-closed', tone: 'closed' };
+  }
+
+  const labels = (issue.labels || []).map((l) => (l.name || '').toLowerCase());
+  const inProgressLabels = [
+    'approved-by-admin',
+    'in-progress',
+    'provisioning',
+    'provisioning-in-progress',
+    'ready-for-plan',
+  ];
+
+  if (inProgressLabels.some((label) => labels.includes(label))) {
+    return { text: 'in-progress', className: 'badge-in-progress', tone: 'in-progress' };
+  }
+
+  return { text: 'open', className: 'badge-open', tone: 'open' };
+}
+
+function statusToneStyles(tone) {
+  if (tone === 'closed') {
+    return {
+      bg: '#f3f4f6',
+      fg: '#6b7280',
+      border: '#e5e7eb',
+    };
+  }
+  if (tone === 'in-progress') {
+    return {
+      bg: '#fff7ed',
+      fg: '#c2410c',
+      border: '#fdba74',
+    };
+  }
+  return {
+    bg: '#e0fbe0',
+    fg: '#16a34a',
+    border: '#bbf7d0',
+  };
+}
+
 async function loadRecentRequests() {
   const list = $('#requests-list');
   try {
@@ -473,6 +517,7 @@ async function loadRecentRequests() {
     });
 
     const issues = Array.from(mergedMap.values())
+      .filter((issue) => !issue.pull_request)
       .filter(isPortalRequest)
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 10);
@@ -483,15 +528,18 @@ async function loadRecentRequests() {
     }
 
     list.innerHTML = issues
-      .map((issue) => `
+      .map((issue) => {
+        const status = deriveTicketStatus(issue);
+        return `
         <div class="request-item">
           <div>
             <div class="request-title"><a href="#" class="ticket-link" data-issue-number="${issue.number}">${issue.title}</a></div>
             <div class="request-meta"><a href="#" class="ticket-number-link" data-issue-number="${issue.number}">#${issue.number}</a> · ${new Date(issue.created_at).toLocaleDateString()}</div>
           </div>
-          <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
+          <span class="badge ${status.className}">${status.text}</span>
         </div>
-      `)
+      `;
+      })
       .join('');
 
     // Attach click handlers to open modal in-portal for titles and numbers
@@ -523,6 +571,7 @@ async function loadRecentRequests() {
 function prependIssueToList(issue) {
   try {
     const list = $('#requests-list');
+    const status = deriveTicketStatus(issue);
     const el = document.createElement('div');
     el.className = 'request-item';
     el.innerHTML = `
@@ -530,7 +579,7 @@ function prependIssueToList(issue) {
         <div class="request-title"><a href="#" class="ticket-link" data-issue-number="${issue.number}">${issue.title}</a></div>
         <div class="request-meta"><a href="#" class="ticket-number-link" data-issue-number="${issue.number}">#${issue.number}</a> · ${new Date(issue.created_at).toLocaleDateString()}</div>
       </div>
-      <span class="badge ${issue.state === 'open' ? 'badge-open' : 'badge-closed'}">${issue.state}</span>
+      <span class="badge ${status.className}">${status.text}</span>
     `;
 
     // Insert at top
@@ -668,6 +717,8 @@ async function openTicketModal(issueNumber) {
     body.innerHTML = '<div class="spinner"></div>';
 
     const issue = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}`);
+    const status = deriveTicketStatus(issue);
+    const tone = statusToneStyles(status.tone);
 
     // Build a visually appealing modal layout
     const created = new Date(issue.created_at).toLocaleString();
@@ -679,7 +730,7 @@ async function openTicketModal(issueNumber) {
             <div style="font-size:1.08rem;font-weight:700;color:#3b2f6b;line-height:1.2;">${escapeHtml(issue.title)}</div>
             <div style="font-size:0.92rem;color:#888;">#${issue.number} &bull; ${created}</div>
           </div>
-          <span style="font-size:0.85rem;padding:4px 12px;border-radius:12px;font-weight:600;background:${issue.state==='open'?'#e0fbe0':'#f3f4f6'};color:${issue.state==='open'?'#16a34a':'#888'};border:1px solid ${issue.state==='open'?'#bbf7d0':'#e5e7eb'};">${issue.state.toUpperCase()}</span>
+          <span style="font-size:0.85rem;padding:4px 12px;border-radius:12px;font-weight:600;background:${tone.bg};color:${tone.fg};border:1px solid ${tone.border};">${status.text.toUpperCase()}</span>
         </div>
         <div style="margin-bottom:14px;font-size:0.97rem;color:#555;"><b>Author:</b> ${escapeHtml(issue.user.login)}</div>
         <hr style="margin:10px 0 18px 0;" />
@@ -687,7 +738,7 @@ async function openTicketModal(issueNumber) {
       </div>
       <div style="margin:32px 0 18px 0; display:flex; justify-content:center;">
         <div class="modal-activity-outer">
-          <div class="modal-activity-title" style="font-weight:900; letter-spacing:0.01em; font-size:1.13rem;">Activity Feed</div>
+          <div class="modal-activity-title">Activity Feed</div>
           <div class="modal-activity-feed" id="modal-activity-feed-list">
             <div style="color:#aaa; font-size:0.97rem;">Loading activity...</div>
           </div>
@@ -731,22 +782,114 @@ async function fetchActivityFeed(issueNumber) {
   try {
     const feedList = document.getElementById('modal-activity-feed-list');
     if (!feedList) return;
+    feedList.innerHTML = '<div style="color:#94a3b8; font-size:0.95rem;">Loading key comments...</div>';
+
     // Fetch comments
     const comments = await ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${issueNumber}/comments`);
     if (!comments || comments.length === 0) {
       feedList.innerHTML = '<div style="color:#aaa; font-size:0.97rem;">No activity yet.</div>';
       return;
     }
-    feedList.innerHTML = comments.map(c => `
-      <div class="modal-activity-item">
-        <div class="modal-activity-meta"><span class="modal-activity-user">${escapeHtml(c.user.login)}</span> <span class="modal-activity-action">commented</span> <span class="modal-activity-date">${new Date(c.created_at).toLocaleString()}</span></div>
-        <div class="modal-activity-body">${escapeHtml(c.body)}</div>
-      </div>
-    `).join('');
+
+    const keyComments = pickKeyComments(comments, 6);
+    feedList.innerHTML = keyComments.map((c) => {
+      const rawBody = (c.body || '').trim();
+      const safeBody = escapeHtml(rawBody || '(empty comment)');
+      const shortBody = toPreviewText(rawBody, 180);
+      const shortSafeBody = escapeHtml(shortBody);
+      const needsToggle = safeBody !== shortSafeBody;
+      const score = scoreComment(rawBody);
+      const badge = score >= 6 ? 'High Signal' : score >= 3 ? 'Useful' : 'Context';
+      const avatar = c.user && c.user.avatar_url ? c.user.avatar_url : '';
+
+      return `
+      <article class="modal-activity-item">
+        <header class="modal-activity-head">
+          <img class="modal-activity-avatar" src="${avatar}" alt="${escapeHtml(c.user.login)} avatar" />
+          <div class="modal-activity-ident">
+            <div class="modal-activity-meta">
+              <span class="modal-activity-user">${escapeHtml(c.user.login)}</span>
+              <span class="modal-activity-action">commented</span>
+            </div>
+            <div class="modal-activity-date">${new Date(c.created_at).toLocaleString()}</div>
+          </div>
+          <span class="modal-activity-badge">${badge}</span>
+        </header>
+        <div class="modal-activity-body" data-expanded="false">
+          <span class="comment-preview">${shortSafeBody}</span>
+          <span class="comment-full hidden">${safeBody}</span>
+        </div>
+        ${needsToggle ? '<button class="modal-comment-toggle" type="button">Show more</button>' : ''}
+      </article>
+      `;
+    }).join('');
+
+    feedList.querySelectorAll('.modal-comment-toggle').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.modal-activity-item');
+        if (!card) return;
+        const body = card.querySelector('.modal-activity-body');
+        const preview = card.querySelector('.comment-preview');
+        const full = card.querySelector('.comment-full');
+        if (!body || !preview || !full) return;
+
+        const expanded = body.dataset.expanded === 'true';
+        if (expanded) {
+          body.dataset.expanded = 'false';
+          preview.classList.remove('hidden');
+          full.classList.add('hidden');
+          btn.textContent = 'Show more';
+        } else {
+          body.dataset.expanded = 'true';
+          preview.classList.add('hidden');
+          full.classList.remove('hidden');
+          btn.textContent = 'Show less';
+        }
+      });
+    });
   } catch (e) {
     const feedList = document.getElementById('modal-activity-feed-list');
     if (feedList) feedList.innerHTML = '<div style="color:#e11d48;">Could not load activity feed.</div>';
   }
+}
+
+function toPreviewText(text, limit = 180) {
+  const normalized = (text || '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return '(empty comment)';
+  if (normalized.length <= limit) return normalized;
+  return `${normalized.slice(0, limit).trim()}...`;
+}
+
+function scoreComment(text) {
+  const t = (text || '').toLowerCase();
+  let score = 0;
+  if (!t) return score;
+  if (t.length >= 60) score += 1;
+  if (/approve|approved|merge|merged|done|completed/.test(t)) score += 3;
+  if (/error|fail|failed|blocked|denied/.test(t)) score += 3;
+  if (/terraform|plan|apply|destroy|workflow|pipeline/.test(t)) score += 2;
+  if (/bucket|region|environment|public access/.test(t)) score += 1;
+  return score;
+}
+
+function pickKeyComments(comments, maxItems = 6) {
+  const unique = new Map();
+  comments.forEach((c) => {
+    const body = (c.body || '').replace(/\s+/g, ' ').trim();
+    if (!body) return;
+    const key = body.toLowerCase();
+    if (!unique.has(key)) unique.set(key, c);
+  });
+
+  const ranked = Array.from(unique.values()).sort((a, b) => {
+    const scoreDiff = scoreComment(b.body) - scoreComment(a.body);
+    if (scoreDiff !== 0) return scoreDiff;
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const selected = ranked.slice(0, maxItems);
+  if (selected.length > 0) return selected;
+  return comments.slice(-Math.min(maxItems, comments.length)).reverse();
 }
 
 function closeTicketModal() {

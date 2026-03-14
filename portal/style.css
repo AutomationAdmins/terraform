@@ -1215,6 +1215,12 @@ body {
   border: 1px solid rgba(139, 148, 158, 0.2);
 }
 
+.badge-in-progress {
+  background: rgba(249, 115, 22, 0.12);
+  color: #c2410c;
+  border: 1px solid rgba(249, 115, 22, 0.28);
+}
+
 .no-requests {
   color: var(--text-muted);
   text-align: center;
@@ -1289,5 +1295,135 @@ footer {
 
   .provider-cards {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Activity feed redesign: compact, aligned, and key-comment focused */
+.modal-activity-title {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dbe4ff;
+  color: #0f172a;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: left;
+}
+
+.modal-activity-feed {
+  display: grid;
+  gap: 9px;
+}
+
+.modal-activity-item {
+  background: #ffffff;
+  border: 1px solid #dbe4ff;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  padding: 9px 10px;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.08);
+}
+
+.modal-activity-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.modal-activity-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid #dbe4ff;
+  object-fit: cover;
+  flex: 0 0 28px;
+}
+
+.modal-activity-ident {
+  min-width: 0;
+  flex: 1;
+}
+
+.modal-activity-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.modal-activity-user {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.93rem;
+}
+
+.modal-activity-action {
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.modal-activity-date {
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.modal-activity-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #155e75;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.modal-activity-body {
+  margin-top: 6px;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 9px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #1f2937;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.modal-comment-toggle {
+  margin-top: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1d4ed8;
+  border-radius: 8px;
+  padding: 4px 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-comment-toggle:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.comment-full.hidden,
+.comment-preview.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .modal-activity-item {
+    padding: 10px 11px;
+  }
+
+  .modal-activity-badge {
+    display: none;
   }
 }
