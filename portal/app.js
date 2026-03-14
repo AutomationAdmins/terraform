@@ -514,18 +514,29 @@ async function loadRecentRequests() {
     const nonce = Date.now();
 
     // Build a robust list: creator issues + labeled issues.
-    // This prevents missing tickets when labels are not attached immediately.
-    const creatorLabeled = await ghAPI(
+    // Fetch in parallel to reduce portal refresh latency.
+    const creatorLabeledPromise = ghAPI(
       `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&creator=${currentUser.login}&per_page=20&state=all&sort=created&direction=desc&t=${nonce}`
     );
 
-    const creatorAll = await ghAPI(
+    const creatorAllPromise = ghAPI(
       `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?creator=${currentUser.login}&per_page=30&state=all&sort=created&direction=desc&t=${nonce}`
     );
 
-    const labeledAll = await ghAPI(
+    const labeledAllPromise = ghAPI(
       `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues?labels=${CONFIG.ISSUE_LABEL}&per_page=20&state=all&sort=created&direction=desc&t=${nonce}`
     );
+
+    const prsPromise = ghAPI(
+      `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/pulls?state=all&base=automation&per_page=100`
+    ).catch(() => []);
+
+    const [creatorLabeled, creatorAll, labeledAll, prs] = await Promise.all([
+      creatorLabeledPromise,
+      creatorAllPromise,
+      labeledAllPromise,
+      prsPromise,
+    ]);
 
     const isPortalRequest = (issue) => {
       const title = (issue.title || '').toLowerCase();
@@ -545,15 +556,7 @@ async function loadRecentRequests() {
       }
     });
 
-    // Fetch all PRs against automation branch in one call to infer status for
-    // issues that lack an in-progress label (e.g. older requests actioned before
-    // the label-writing step was added to the workflow).
-    let prs = [];
-    try {
-      prs = await ghAPI(
-        `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/pulls?state=all&base=automation&per_page=100`
-      );
-    } catch (_) { /* non-fatal */ }
+    // Use PR metadata to infer status for issues that lack an in-progress label.
     _issuePRMap = {};
     (prs || []).forEach((pr) => {
       const text = `${pr.title || ''} ${pr.body || ''}`;
@@ -574,23 +577,32 @@ async function loadRecentRequests() {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 10);
 
-    // Re-fetch each issue individually so we always get live labels/state.
-    // The list endpoint can serve stale label data; the single-issue endpoint
-    // always returns the current state.
+    // Fast pass: render immediately from list data so UI becomes interactive sooner.
+    allIssues = candidates;
+    // Reset filter to 'All' on each reload.
+    document.querySelectorAll('.filter-tab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.filter === 'all');
+    });
+    updateFilterCounts(candidates);
+
+    if (!candidates || candidates.length === 0) {
+      list.innerHTML = '<p class="no-requests">No requests yet</p>';
+      return true;
+    }
+
+    renderRequestsList(candidates);
+
+    // Fresh pass: re-fetch each issue individually for live labels/state.
+    // This keeps status accuracy while not blocking the first paint.
     const freshResults = await Promise.all(
       candidates.map((c) =>
         ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${c.number}`)
-          .catch(() => c) // fall back to cached copy on error
+          .catch(() => c)
       )
     );
 
     const issues = freshResults.filter(Boolean);
-
     allIssues = issues;
-    // Reset filter to 'All' on each fresh load
-    document.querySelectorAll('.filter-tab').forEach((b) => {
-      b.classList.toggle('active', b.dataset.filter === 'all');
-    });
     updateFilterCounts(issues);
 
     if (!issues || issues.length === 0) {
