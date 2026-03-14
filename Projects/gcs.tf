@@ -63,3 +63,16 @@ resource "google_storage_bucket" "sys_ap_1232_32321" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "my_app_221_sys_test" {
+  name     = "my-app-221-sys-test"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
