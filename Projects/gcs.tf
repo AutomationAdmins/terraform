@@ -89,3 +89,16 @@ resource "google_storage_bucket" "sa_ashas_12_asa" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "ahas_121_awa_12" {
+  name     = "ahas-121-awa-12"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
