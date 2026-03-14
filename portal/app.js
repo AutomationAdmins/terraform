@@ -8,6 +8,8 @@ const $ = (sel) => document.querySelector(sel);
 let accessToken = localStorage.getItem('gh_token');
 let currentUser = null;
 let allIssues = []; // full list for client-side status filtering
+let _pollTimer = null; // background status-refresh timer
+let _issuePRMap = {}; // issue_number → { merged: bool, state: 'open'|'closed' }
 
 // ---- DOM refs ----
 const loginSection = $('#login-section');
@@ -39,6 +41,7 @@ $('#login-btn').addEventListener('click', () => {
 });
 
 $('#logout-btn').addEventListener('click', () => {
+  stopPolling();
   localStorage.removeItem('gh_token');
   accessToken = null;
   currentUser = null;
@@ -134,6 +137,7 @@ async function ghAPI(endpoint, token = accessToken, options = {}) {
   const { headers: optHeaders, ...restOptions } = options;
   const res = await fetch(`https://api.github.com${endpoint}`, {
     ...restOptions,
+    cache: 'no-store',
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
@@ -460,6 +464,16 @@ function deriveTicketStatus(issue) {
     return { text: 'in-progress', className: 'badge-in-progress', tone: 'in-progress' };
   }
 
+  // Infer in-progress from a linked PR when no status label is present.
+  // A merged OR open PR means work was picked up — show in-progress.
+  // Closed status is ONLY set from issue.state === 'closed' (checked above),
+  // never from PR state, to avoid false-positives when the apply workflow
+  // failed to close the issue.
+  const prInfo = _issuePRMap[issue.number];
+  if (prInfo && (prInfo.merged || prInfo.state === 'open')) {
+    return { text: 'in-progress', className: 'badge-in-progress', tone: 'in-progress' };
+  }
+
   return { text: 'open', className: 'badge-open', tone: 'open' };
 }
 
@@ -531,11 +545,46 @@ async function loadRecentRequests() {
       }
     });
 
-    const issues = Array.from(mergedMap.values())
+    // Fetch all PRs against automation branch in one call to infer status for
+    // issues that lack an in-progress label (e.g. older requests actioned before
+    // the label-writing step was added to the workflow).
+    let prs = [];
+    try {
+      prs = await ghAPI(
+        `/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/pulls?state=all&base=automation&per_page=100`
+      );
+    } catch (_) { /* non-fatal */ }
+    _issuePRMap = {};
+    (prs || []).forEach((pr) => {
+      const text = `${pr.title || ''} ${pr.body || ''}`;
+      const m = text.match(/Issue\s*#(\d+)/i);
+      if (m) {
+        const num = parseInt(m[1], 10);
+        // Prefer merged record if we've already stored an entry
+        if (!_issuePRMap[num] || pr.merged_at) {
+          _issuePRMap[num] = { merged: !!pr.merged_at, state: pr.state };
+        }
+      }
+    });
+
+    // Candidate list from the merged map (used only for ordering/filtering)
+    const candidates = Array.from(mergedMap.values())
       .filter((issue) => !issue.pull_request)
       .filter(isPortalRequest)
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 10);
+
+    // Re-fetch each issue individually so we always get live labels/state.
+    // The list endpoint can serve stale label data; the single-issue endpoint
+    // always returns the current state.
+    const freshResults = await Promise.all(
+      candidates.map((c) =>
+        ghAPI(`/repos/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/issues/${c.number}`)
+          .catch(() => c) // fall back to cached copy on error
+      )
+    );
+
+    const issues = freshResults.filter(Boolean);
 
     allIssues = issues;
     // Reset filter to 'All' on each fresh load
@@ -948,6 +997,25 @@ function escapeHtml(str) {
 // Init
 // ============================================================
 
+// ---- Background polling: silently refresh issue statuses ----
+function startPolling(intervalMs = 30000) {
+  stopPolling();
+  _pollTimer = setInterval(async () => {
+    try {
+      await loadRecentRequests();
+    } catch (_) {
+      // silent — don't surface polling errors to the user
+    }
+  }, intervalMs);
+}
+
+function stopPolling() {
+  if (_pollTimer !== null) {
+    clearInterval(_pollTimer);
+    _pollTimer = null;
+  }
+}
+
 async function initApp() {
   if (!accessToken) {
     showLogin();
@@ -959,6 +1027,7 @@ async function initApp() {
     showApp();
     bindTicketControls();
     await loadRecentRequests();
+    startPolling(30000); // refresh every 30 s to pick up label changes automatically
     // Show requests on service-section
     document.getElementById('requests-section').classList.remove('hidden');
   } catch {
