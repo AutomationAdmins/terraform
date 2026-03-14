@@ -823,7 +823,8 @@ async function fetchActivityFeed(issueNumber) {
       return;
     }
 
-    const keyComments = pickKeyComments(comments, 6);
+    const keyComments = pickKeyComments(comments, 6)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     feedList.innerHTML = keyComments.map((c) => {
       const rawBody = (c.body || '').trim();
       const safeBody = escapeHtml(rawBody || '(empty comment)');
