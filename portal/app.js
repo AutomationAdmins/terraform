@@ -7,6 +7,7 @@ const $ = (sel) => document.querySelector(sel);
 // ---- State ----
 let accessToken = localStorage.getItem('gh_token');
 let currentUser = null;
+let allIssues = []; // full list for client-side status filtering
 
 // ---- DOM refs ----
 const loginSection = $('#login-section');
@@ -406,6 +407,20 @@ function bindTicketControls() {
     }
   }
 
+  // Status filter tabs
+  document.querySelectorAll('.filter-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      const filtered =
+        filter === 'all'
+          ? allIssues
+          : allIssues.filter((issue) => deriveTicketStatus(issue).tone === filter);
+      renderRequestsList(filtered);
+    });
+  });
+
   if (refreshBtn) {
     refreshBtn.onclick = async () => {
       refreshBtn.disabled = true;
@@ -522,41 +537,19 @@ async function loadRecentRequests() {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 10);
 
+    allIssues = issues;
+    // Reset filter to 'All' on each fresh load
+    document.querySelectorAll('.filter-tab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.filter === 'all');
+    });
+    updateFilterCounts(issues);
+
     if (!issues || issues.length === 0) {
       list.innerHTML = '<p class="no-requests">No requests yet</p>';
       return true;
     }
 
-    list.innerHTML = issues
-      .map((issue) => {
-        const status = deriveTicketStatus(issue);
-        return `
-        <div class="request-item">
-          <div>
-            <div class="request-title"><a href="#" class="ticket-link" data-issue-number="${issue.number}">${issue.title}</a></div>
-            <div class="request-meta"><a href="#" class="ticket-number-link" data-issue-number="${issue.number}">#${issue.number}</a> · ${new Date(issue.created_at).toLocaleDateString()}</div>
-          </div>
-          <span class="badge ${status.className}">${status.text}</span>
-        </div>
-      `;
-      })
-      .join('');
-
-    // Attach click handlers to open modal in-portal for titles and numbers
-    document.querySelectorAll('.ticket-link').forEach((el) => {
-      el.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        const num = el.dataset.issueNumber;
-        openTicketModal(num);
-      });
-    });
-    document.querySelectorAll('.ticket-number-link').forEach((el) => {
-      el.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        const num = el.dataset.issueNumber;
-        openTicketModal(num);
-      });
-    });
+    renderRequestsList(issues);
 
     return true;
   } catch (err) {
@@ -567,13 +560,52 @@ async function loadRecentRequests() {
   }
 }
 
+// Update count badges on filter tabs
+function updateFilterCounts(issues) {
+  const counts = { all: issues.length, open: 0, 'in-progress': 0, closed: 0 };
+  issues.forEach((issue) => {
+    const tone = deriveTicketStatus(issue).tone;
+    if (counts[tone] !== undefined) counts[tone]++;
+  });
+  Object.entries(counts).forEach(([filter, n]) => {
+    const el = document.getElementById(`filter-count-${filter}`);
+    if (el) el.textContent = n > 0 ? String(n) : '';
+  });
+}
+
+// Render a (possibly filtered) subset of issues into #requests-list
+function renderRequestsList(issues) {
+  const list = $('#requests-list');
+  if (!list) return;
+
+  if (!issues || issues.length === 0) {
+    list.innerHTML = '<p class="no-requests">No requests match this filter</p>';
+    return;
+  }
+
+  list.innerHTML = issues
+    .map((issue) => {
+      const status = deriveTicketStatus(issue);
+      return `
+      <div class="request-item status-${status.tone}">
+        <div>
+          <div class="request-title"><a href="#" class="ticket-link" data-issue-number="${issue.number}">${issue.title}</a></div>
+          <div class="request-meta"><a href="#" class="ticket-number-link" data-issue-number="${issue.number}">#${issue.number}</a> · ${new Date(issue.created_at).toLocaleDateString()}</div>
+        </div>
+        <span class="badge ${status.className}">${status.text}</span>
+      </div>
+    `;
+    })
+    .join('');
+}
+
 // Prepend newly created issue to the list (optimistic UI)
 function prependIssueToList(issue) {
   try {
     const list = $('#requests-list');
     const status = deriveTicketStatus(issue);
     const el = document.createElement('div');
-    el.className = 'request-item';
+    el.className = `request-item status-${status.tone}`;
     el.innerHTML = `
       <div>
         <div class="request-title"><a href="#" class="ticket-link" data-issue-number="${issue.number}">${issue.title}</a></div>
