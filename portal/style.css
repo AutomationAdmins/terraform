@@ -845,6 +845,16 @@ body {
   border-color: rgba(123,66,188,0.6);
 }
 
+.tech-pill-gitops {
+  background: linear-gradient(135deg, rgba(36,41,47,0.18), rgba(100,116,139,0.06));
+  border: 1px solid rgba(100,116,139,0.35);
+  color: #475569;
+}
+.tech-pill-gitops:hover {
+  background: linear-gradient(135deg, rgba(36,41,47,0.30), rgba(100,116,139,0.14));
+  border-color: rgba(100,116,139,0.65);
+}
+
 /* Pulsing LIVE chip */
 .nav-live-chip {
   display: inline-flex;
@@ -2395,9 +2405,10 @@ footer {
   font-family: 'Inter', sans-serif;
 }
 
-.sp-res-aws { border-left: 2px solid rgba(249,115,22,0.40); }
-.sp-res-gcp { border-left: 2px solid rgba(66,133,244,0.40); }
-.sp-res-tf  { border-left: 2px solid rgba(124,58,237,0.40); }
+.sp-res-aws    { border-left: 2px solid rgba(249,115,22,0.40); }
+.sp-res-gcp    { border-left: 2px solid rgba(66,133,244,0.40); }
+.sp-res-tf     { border-left: 2px solid rgba(124,58,237,0.40); }
+.sp-res-github { border-left: 2px solid rgba(148,163,184,0.40); }
 
 /* ================================================================
    PERFORMANCE: GPU-composited animator hints
