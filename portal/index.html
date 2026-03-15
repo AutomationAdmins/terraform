@@ -4,31 +4,318 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudGate | Infra Self-Service</title>
-  <link rel="stylesheet" href="style_v3.css" />
+  <link rel="stylesheet" href="style.css?v=20260314c" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <!-- Animated background particles -->
+  <!-- Animated background -->
   <div class="bg-grid"></div>
+  <div class="bg-liner" aria-hidden="true"></div>
+
+  <!-- =====================================================
+       LEFT SIDE PANEL — Cloud Architecture Diagram
+       Visible only on wide viewports (≥1240px); aria-hidden
+       ===================================================== -->
+  <aside class="side-panel side-panel-left" aria-hidden="true">
+
+    <div class="sp-header">
+      <span class="sp-header-dot sp-dot-purple"></span>
+      <span class="sp-header-text">INFRASTRUCTURE</span>
+    </div>
+
+    <svg class="sp-arch-svg" viewBox="0 0 160 308" fill="none">
+      <!-- T1: Users -->
+      <g class="arch-t1">
+        <rect x="50" y="2" width="60" height="26" rx="8" fill="rgba(124,58,237,0.12)" stroke="rgba(124,58,237,0.38)" stroke-width="1"/>
+        <text x="80" y="19" text-anchor="middle" fill="rgba(167,139,250,0.95)" font-size="8" font-family="Inter,sans-serif" font-weight="700">USERS</text>
+      </g>
+      <line x1="80" y1="28" x2="80" y2="52" stroke="rgba(124,58,237,0.22)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <circle class="sp-pkt sp-pkt1" cx="80" cy="28" r="2.5" fill="#a78bfa"/>
+      <!-- T2: Load Balancer -->
+      <g class="arch-t2">
+        <rect x="20" y="52" width="120" height="26" rx="8" fill="rgba(6,182,212,0.10)" stroke="rgba(6,182,212,0.32)" stroke-width="1"/>
+        <text x="80" y="69" text-anchor="middle" fill="rgba(103,232,249,0.9)" font-size="8" font-family="Inter,sans-serif" font-weight="700">LOAD BALANCER</text>
+      </g>
+      <line x1="48"  y1="78" x2="33"  y2="102" stroke="rgba(99,102,241,0.18)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <line x1="80"  y1="78" x2="80"  y2="102" stroke="rgba(99,102,241,0.18)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <line x1="112" y1="78" x2="127" y2="102" stroke="rgba(99,102,241,0.18)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <circle class="sp-pkt sp-pkt2" cx="80" cy="82" r="2.5" fill="#67e8f9"/>
+      <!-- T3: Compute row -->
+      <g class="arch-t3a">
+        <rect x="4"   y="102" width="47" height="22" rx="6" fill="rgba(99,102,241,0.10)" stroke="rgba(99,102,241,0.32)" stroke-width="1"/>
+        <text x="27"  y="116" text-anchor="middle" fill="rgba(165,180,252,0.9)" font-size="7" font-family="Inter,sans-serif" font-weight="600">EC2</text>
+      </g>
+      <g class="arch-t3b">
+        <rect x="57"  y="102" width="46" height="22" rx="6" fill="rgba(99,102,241,0.10)" stroke="rgba(99,102,241,0.32)" stroke-width="1"/>
+        <text x="80"  y="116" text-anchor="middle" fill="rgba(165,180,252,0.9)" font-size="7" font-family="Inter,sans-serif" font-weight="600">ECS</text>
+      </g>
+      <g class="arch-t3c">
+        <rect x="109" y="102" width="47" height="22" rx="6" fill="rgba(99,102,241,0.10)" stroke="rgba(99,102,241,0.32)" stroke-width="1"/>
+        <text x="132" y="116" text-anchor="middle" fill="rgba(165,180,252,0.9)" font-size="7" font-family="Inter,sans-serif" font-weight="600">GCE</text>
+      </g>
+      <line x1="27"  y1="124" x2="60"  y2="148" stroke="rgba(244,114,182,0.16)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <line x1="80"  y1="124" x2="80"  y2="148" stroke="rgba(244,114,182,0.16)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <line x1="132" y1="124" x2="100" y2="148" stroke="rgba(244,114,182,0.16)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <circle class="sp-pkt sp-pkt3" cx="80" cy="133" r="2.5" fill="#f472b6"/>
+      <!-- T4: Database -->
+      <g class="arch-t4">
+        <rect x="20" y="148" width="120" height="26" rx="8" fill="rgba(244,114,182,0.08)" stroke="rgba(244,114,182,0.28)" stroke-width="1"/>
+        <text x="80" y="165" text-anchor="middle" fill="rgba(249,168,212,0.9)" font-size="8" font-family="Inter,sans-serif" font-weight="700">DATABASE</text>
+      </g>
+      <line x1="80" y1="174" x2="80" y2="196" stroke="rgba(52,211,153,0.18)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <circle class="sp-pkt sp-pkt1" cx="80" cy="181" r="2.5" fill="#34d399" style="animation-delay:1.6s"/>
+      <!-- T5: Storage -->
+      <g class="arch-t5">
+        <rect x="20" y="196" width="120" height="26" rx="8" fill="rgba(52,211,153,0.08)" stroke="rgba(52,211,153,0.28)" stroke-width="1"/>
+        <text x="80" y="213" text-anchor="middle" fill="rgba(110,231,183,0.9)" font-size="8" font-family="Inter,sans-serif" font-weight="700">S3 / GCS</text>
+      </g>
+      <line x1="80" y1="222" x2="80" y2="244" stroke="rgba(123,66,188,0.18)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <circle class="sp-pkt sp-pkt2" cx="80" cy="230" r="2.5" fill="#c084fc" style="animation-delay:0.9s"/>
+      <!-- T6: Terraform IaC -->
+      <g class="arch-t6">
+        <rect x="20" y="244" width="120" height="26" rx="8" fill="rgba(123,66,188,0.10)" stroke="rgba(123,66,188,0.32)" stroke-width="1"/>
+        <text x="80" y="261" text-anchor="middle" fill="rgba(196,181,253,0.9)" font-size="8" font-family="Inter,sans-serif" font-weight="700">TERRAFORM IaC</text>
+      </g>
+      <!-- LED status indicators -->
+      <circle class="sp-led sp-led-cyan"   cx="154" cy="65"  r="3"/>
+      <circle class="sp-led sp-led-purple" cx="154" cy="115" r="3"/>
+      <circle class="sp-led sp-led-pink"   cx="154" cy="161" r="3"/>
+      <circle class="sp-led sp-led-cyan"   cx="154" cy="209" r="3" style="animation-delay:0.5s"/>
+      <circle class="sp-led sp-led-purple" cx="154" cy="257" r="3" style="animation-delay:1.1s"/>
+    </svg>
+
+    <div class="sp-stats-row">
+      <div class="sp-stat-chip">
+        <span class="sp-stat-val sp-val-cyan" id="sp-cpu">87%</span>
+        <span class="sp-stat-key">CPU</span>
+      </div>
+      <div class="sp-stat-chip">
+        <span class="sp-stat-val sp-val-green" id="sp-mem">64%</span>
+        <span class="sp-stat-key">MEM</span>
+      </div>
+      <div class="sp-stat-chip">
+        <span class="sp-stat-val" id="sp-up">99.9%</span>
+        <span class="sp-stat-key">UP</span>
+      </div>
+    </div>
+
+    <svg class="sp-sparkline" viewBox="0 0 160 40" fill="none">
+      <defs>
+        <linearGradient id="spark-grad" x1="0" y1="0" x2="160" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="#7c3aed"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <polyline class="sp-spark-line" points="0,35 15,28 30,22 45,30 60,18 75,25 90,12 105,20 120,8 135,15 160,5" stroke="url(#spark-grad)" stroke-width="1.5" fill="none"/>
+      <circle class="sp-spark-dot" cx="160" cy="5" r="3.5" fill="#06b6d4"/>
+    </svg>
+
+    <div class="sp-footer-label">
+      <span class="sp-footer-dot"></span>
+      LIVE INFRA
+    </div>
+
+  </aside>
+
+  <!-- =====================================================
+       RIGHT SIDE PANEL — Terraform Pipeline
+       Visible only on wide viewports (≥1240px); aria-hidden
+       ===================================================== -->
+  <aside class="side-panel side-panel-right" aria-hidden="true">
+
+    <div class="sp-header">
+      <span class="sp-header-dot sp-dot-cyan"></span>
+      <span class="sp-header-text">TF PIPELINE</span>
+    </div>
+
+    <div class="sp-pipeline-wrap">
+
+      <div class="sp-stage sp-stage-done">
+        <div class="sp-stage-icon">
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+            <circle cx="10" cy="8" r="4.5" stroke="#a78bfa" stroke-width="1.5"/>
+            <path d="M3 18c0-3.31 3.13-6 7-6s7 2.69 7 6" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sp-stage-body">
+          <span class="sp-stage-name">Source</span>
+          <span class="sp-stage-sub">GitHub · main</span>
+        </div>
+        <span class="sp-stage-badge sp-badge-purple">DONE</span>
+      </div>
+      <div class="sp-pipe-connector sp-pipe-purple"><div class="sp-pipe-dot-travel sp-travel-1"></div></div>
+
+      <div class="sp-stage sp-stage-done">
+        <div class="sp-stage-icon">
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+            <rect x="3" y="3" width="14" height="14" rx="2" stroke="#67e8f9" stroke-width="1.5"/>
+            <path d="M7 8h6M7 11h4" stroke="#67e8f9" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sp-stage-body">
+          <span class="sp-stage-name">TF Plan</span>
+          <span class="sp-stage-sub">3 add · 1 change</span>
+        </div>
+        <span class="sp-stage-badge sp-badge-cyan">DONE</span>
+      </div>
+      <div class="sp-pipe-connector sp-pipe-cyan"><div class="sp-pipe-dot-travel sp-travel-2"></div></div>
+
+      <div class="sp-stage sp-stage-active">
+        <div class="sp-stage-icon">
+          <svg class="sp-icon-glow" viewBox="0 0 20 20" width="15" height="15" fill="none">
+            <path d="M13 2L3 14h7l-3 7 10-12h-7l3-7z" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sp-stage-body">
+          <span class="sp-stage-name">TF Apply</span>
+          <span class="sp-stage-sub">Provisioning…</span>
+        </div>
+        <span class="sp-stage-badge sp-badge-yellow sp-badge-pulse">LIVE</span>
+      </div>
+      <div class="sp-pipe-connector sp-pipe-yellow"><div class="sp-pipe-dot-travel sp-travel-3"></div></div>
+
+      <div class="sp-stage sp-stage-pending">
+        <div class="sp-stage-icon">
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+            <ellipse cx="10" cy="7" rx="7" ry="2.5" stroke="#6ee7b7" stroke-width="1.5"/>
+            <path d="M3 7v6c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5V7" stroke="#6ee7b7" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="sp-stage-body">
+          <span class="sp-stage-name">State Save</span>
+          <span class="sp-stage-sub">GCS backend</span>
+        </div>
+        <span class="sp-stage-badge sp-badge-green">NEXT</span>
+      </div>
+      <div class="sp-pipe-connector sp-pipe-green"><div class="sp-pipe-dot-travel sp-travel-4"></div></div>
+
+      <div class="sp-stage sp-stage-pending">
+        <div class="sp-stage-icon">
+          <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+            <path d="M18 8A8 8 0 1 0 4.5 15.5L3 18l3-1A8 8 0 0 0 18 8z" stroke="rgba(100,116,139,0.55)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="sp-stage-body">
+          <span class="sp-stage-name">Notify</span>
+          <span class="sp-stage-sub">Slack · Email</span>
+        </div>
+        <span class="sp-stage-badge sp-badge-dim">QUEUE</span>
+      </div>
+
+    </div>
+
+    <div class="sp-resource-nodes">
+      <div class="sp-res-node sp-res-aws">
+        <svg viewBox="0 0 12 12" width="10" height="10" fill="none">
+          <path d="M2 4.5C2 3.12 3.12 2 4.5 2h3C8.88 2 10 3.12 10 4.5v3C10 8.88 8.88 10 7.5 10h-3C3.12 10 2 8.88 2 7.5v-3z" stroke="#f97316" stroke-width="1.2"/>
+        </svg>
+        <span class="sp-res-label">S3 Bucket</span>
+      </div>
+      <div class="sp-res-node sp-res-gcp">
+        <svg viewBox="0 0 12 12" width="10" height="10" fill="none">
+          <circle cx="6" cy="6" r="4.5" stroke="#4285F4" stroke-width="1.2"/>
+          <path d="M6 3v3l2 1.5" stroke="#4285F4" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <span class="sp-res-label">GCS Bucket</span>
+      </div>
+      <div class="sp-res-node sp-res-tf">
+        <svg viewBox="0 0 12 12" width="10" height="10" fill="none">
+          <polygon points="4,1 4,6 6.5,7.5 6.5,2.5" fill="#a78bfa"/>
+          <polygon points="7,3 7,7.5 10,6 10,1.5"   fill="#7c3aed"/>
+        </svg>
+        <span class="sp-res-label">IAM Role</span>
+      </div>
+      <div class="sp-res-node sp-res-github">
+        <svg viewBox="0 0 12 12" width="10" height="10" fill="rgba(226,232,240,0.85)">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M6 1C3.24 1 1 3.24 1 6c0 2.21 1.43 4.08 3.42 4.74.25.05.34-.11.34-.24 0-.12-.01-.51-.01-.93-1.24.27-1.5-.6-1.5-.6-.2-.52-.5-.65-.5-.65-.41-.28 0-.28 0-.28.46.03.7.47.7.47.4.69 1.05.49 1.31.37.04-.29.16-.49.29-.6-1.01-.11-2.07-.5-2.07-2.24 0-.5.18-.9.47-1.22-.05-.11-.2-.58.05-1.2 0 0 .39-.13 1.26.47.37-.1.76-.15 1.14-.15.38 0 .77.05 1.14.15.87-.6 1.26-.47 1.26-.47.25.62.09 1.09.04 1.2.3.32.47.72.47 1.22 0 1.74-1.06 2.13-2.08 2.24.16.14.31.41.31.84 0 .6-.01 1.09-.01 1.24 0 .12.08.26.31.22A5.003 5.003 0 0011 6c0-2.76-2.24-5-5-5z"/>
+        </svg>
+        <span class="sp-res-label">GitHub Actions</span>
+      </div>
+    </div>
+
+    <div class="sp-footer-label">
+      <span class="sp-footer-dot sp-footer-dot-green"></span>
+      RUN #247
+    </div>
+
+  </aside>
 
   <div class="container">
     <!-- Navbar -->
     <nav class="navbar">
+
+      <!-- ===== LEFT LOGO ===== -->
       <div class="nav-brand">
         <div class="logo">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="url(#cloud-grad)"/>
-            <defs><linearGradient id="cloud-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
-          </svg>
-          <span class="brand-text">Cloud<span class="brand-accent">Gate</span></span>
+          <div class="logo-icon-wrap">
+            <span class="logo-orb-ring"></span>
+            <svg class="logo-main-svg" viewBox="0 0 36 36" width="38" height="38" fill="none">
+              <path d="M27 16.5h-1.89A12 12 0 1 0 13.5 29.5H27a7.5 7.5 0 0 0 0-15z" fill="url(#nav-lgrad)"/>
+              <path d="M19.5 14l-5.5 8.5h5.5l-2 5.5 8-10.5h-5.5L19.5 14z" fill="rgba(255,255,255,0.93)"/>
+              <defs>
+                <linearGradient id="nav-lgrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%"   stop-color="#7c3aed"/>
+                  <stop offset="55%"  stop-color="#6366f1"/>
+                  <stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-name-wrap">
+            <span class="brand-text">Cloud<span class="brand-accent">Gate</span></span>
+            <span class="brand-sub">Infra Self&#8209;Service</span>
+          </div>
         </div>
       </div>
-      <div class="nav-links">
-        <a href="#" class="nav-link active">Dashboard</a>
-        <a href="#" class="nav-link">Docs</a>
+
+      <!-- ===== RIGHT LOGO STRIP + NAV ===== -->
+      <div class="nav-right-wrap">
+        <div class="nav-tech-strip">
+          <div class="tech-pill tech-pill-aws" title="Amazon Web Services">
+            <svg viewBox="0 0 20 20" width="13" height="13" fill="none">
+              <path d="M3.5 12C1.9 11.5 1 9.9 1.5 8.3 2 6.3 3.8 5.3 5.6 5.8c.7-2 2.9-3.1 4.8-2.3s2.7 3 1.8 4.9c1.5.3 2.3 1.7 1.8 3H3.5z" fill="#f97316"/>
+              <path d="M2.5 14.5l1.5-1.5h9.5l1.5 1.5" stroke="#f97316" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            AWS
+          </div>
+          <div class="tech-pill tech-pill-gcp" title="Google Cloud Platform">
+            <svg viewBox="0 0 20 20" width="13" height="13" fill="none">
+              <path d="M14.5 8H10V4a6 6 0 0 1 4.5 4z" fill="#34A853"/>
+              <path d="M10 4v6h6a6 6 0 0 0-6-6z" fill="#4285F4" opacity="0.85"/>
+              <path d="M4 10a6 6 0 0 0 6 6v-6H4z" fill="#FBBC05"/>
+              <path d="M10 16a6 6 0 0 0 5.2-3H10v3z" fill="#EA4335"/>
+            </svg>
+            GCP
+          </div>
+          <div class="tech-pill tech-pill-tf" title="Terraform by HashiCorp">
+            <svg viewBox="0 0 20 20" width="13" height="13" fill="none">
+              <polygon points="7,3 7,9 11.5,11.5 11.5,5.5"   fill="#7b42bc"/>
+              <polygon points="12.5,5.5 12.5,11.5 17,9 17,3"  fill="#5c4ee5"/>
+              <polygon points="2,5.5 2,11.5 6.5,14 6.5,8"     fill="#a78bfa"/>
+              <polygon points="7,13.5 7,16.5 11.5,19 11.5,16" fill="#7b42bc" opacity="0.75"/>
+            </svg>
+            TF
+          </div>
+          <div class="tech-pill tech-pill-gitops" title="GitHub Actions / GitOps">
+            <svg viewBox="0 0 20 20" width="13" height="13" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0018 10c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            GitOps
+          </div>
+          <div class="nav-live-chip">
+            <span class="live-pulse-dot"></span>
+            LIVE
+          </div>
+        </div>
+        <div class="nav-divider-v"></div>
+        <div class="nav-links">
+          <a href="#" class="nav-link active">Dashboard</a>
+          <a href="#" class="nav-link">Docs</a>
+        </div>
       </div>
+
     </nav>
 
     <!-- Hero Header -->
@@ -86,17 +373,79 @@
 
     <!-- User Info -->
     <div id="user-section" class="card hidden">
-      <div class="user-bar">
-        <div class="user-info">
-          <img id="user-avatar" src="" alt="avatar" class="avatar" />
-          <div>
-            <span id="user-name" class="user-name-text"></span>
-            <span class="user-role">Developer</span>
+        <div class="user-bar">
+          <div class="user-info">
+            <img id="user-avatar" src="" alt="avatar" class="avatar" />
+            <div>
+              <span id="user-name" class="user-name-text"></span>
+              <span class="user-role">Developer</span>
+            </div>
           </div>
+          <button id="logout-btn" class="btn btn-sm btn-outline">Sign out</button>
         </div>
-        <button id="logout-btn" class="btn btn-sm btn-outline">Sign out</button>
-      </div>
     </div>
+
+      <!-- Service Request Section -->
+      <div id="service-section" class="card hidden">
+        <div class="card-title-row">
+          <h2>Service Request</h2>
+        </div>
+        <div class="service-subtitle" style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.05rem; text-align: center;">
+          Kindly select the appropriate provider to provision the resource
+        </div>
+        <div class="provider-select-row stylish-provider-row">
+          <button class="provider-btn stylish-provider-btn" id="provider-aws" data-provider="AWS">
+            <span class="provider-icon aws-icon"></span>
+            <span class="provider-label">AWS</span>
+          </button>
+          <button class="provider-btn stylish-provider-btn" id="provider-gcp" data-provider="GCP">
+            <span class="provider-icon gcp-icon"></span>
+            <span class="provider-label">GCP</span>
+          </button>
+        </div>
+        <div id="service-list" class="service-list hidden"></div>
+        <div style="height: 48px;"></div>
+        <!-- Recent Requests -->
+        <div id="requests-section" class="card stylish-requests-card">
+          <div class="card-title-row">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <h2>Recent Requests</h2>
+          </div>
+          <div class="ticket-controls-row">
+            <input id="ticket-number-input" type="number" min="1" placeholder="Enter ticket #" class="ticket-input ticket-input-lg" />
+            <button id="open-ticket-btn" class="btn btn-md btn-primary ticket-action-btn ticket-btn-lg">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="vertical-align:middle;margin-right:8px;"><path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm1 13h-2v-2h2v2zm0-4h-2V7h2v4z" fill="#fff"/></svg>
+              Open Ticket
+            </button>
+            <button id="refresh-tickets-btn" class="btn btn-md btn-outline ticket-action-btn">
+              <svg width="17" height="17" viewBox="0 0 20 20" fill="none" style="vertical-align:middle;margin-right:8px;"><path d="M4 4v5h5M16 16v-5h-5" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.66 6.34A8 8 0 1 0 18 10" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></svg>
+              Refresh Requests
+            </button>
+          </div>
+          <div class="filter-track">
+            <button class="filter-tab active" data-filter="all">
+              <span class="filter-tab-label">All</span>
+              <span class="filter-tab-count" id="filter-count-all"></span>
+            </button>
+            <button class="filter-tab" data-filter="open">
+              <span class="filter-tab-dot filter-dot-open"></span>
+              <span class="filter-tab-label">Open</span>
+              <span class="filter-tab-count" id="filter-count-open"></span>
+            </button>
+            <button class="filter-tab" data-filter="in-progress">
+              <span class="filter-tab-dot filter-dot-in-progress"></span>
+              <span class="filter-tab-label">In&nbsp;Progress</span>
+              <span class="filter-tab-count" id="filter-count-in-progress"></span>
+            </button>
+            <button class="filter-tab" data-filter="closed">
+              <span class="filter-tab-dot filter-dot-closed"></span>
+              <span class="filter-tab-label">Closed</span>
+              <span class="filter-tab-count" id="filter-count-closed"></span>
+            </button>
+          </div>
+          <div id="requests-list"></div>
+        </div>
+      </div>
 
     <!-- Request Form -->
     <div id="form-section" class="card hidden">
@@ -105,31 +454,8 @@
         <h2>New Bucket Request</h2>
       </div>
       <form id="bucket-form">
-        <!-- Provider Selection Cards -->
-        <div class="form-group">
-          <label>Cloud Provider <span class="required">*</span></label>
-          <div class="provider-cards">
-            <label class="provider-card" data-provider="AWS">
-              <input type="radio" name="cloud_provider_radio" value="AWS" required />
-              <div class="provider-card-inner">
-                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9900" d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576a.37.37 0 0 1 .064.2c0 .084-.048.168-.152.252l-.504.336a.382.382 0 0 1-.208.076c-.08 0-.16-.04-.24-.112a2.47 2.47 0 0 1-.288-.376 6.18 6.18 0 0 1-.248-.472c-.624.736-1.408 1.104-2.352 1.104-.672 0-1.208-.192-1.6-.576-.392-.384-.592-.896-.592-1.536 0-.68.24-1.232.728-1.648s1.136-.624 1.96-.624c.272 0 .552.024.848.064.296.04.6.104.92.176v-.584c0-.608-.128-1.032-.384-1.28-.264-.248-.704-.368-1.328-.368-.288 0-.584.032-.888.104-.304.072-.6.168-.888.28a2.13 2.13 0 0 1-.272.12.47.47 0 0 1-.12.02c-.168 0-.252-.12-.252-.368v-.392c0-.192.024-.336.08-.424a.826.826 0 0 1 .328-.236c.288-.144.632-.264 1.032-.36a5.09 5.09 0 0 1 1.272-.152c.968 0 1.676.22 2.128.66.448.44.676 1.108.676 2.008v2.64zm-3.24 1.2c.264 0 .536-.048.824-.144.288-.096.544-.272.76-.52a1.27 1.27 0 0 0 .316-.592c.056-.208.088-.456.088-.744v-.36a6.76 6.76 0 0 0-.736-.136 6.02 6.02 0 0 0-.752-.048c-.536 0-.928.104-1.184.32-.256.216-.38.528-.38.936 0 .384.096.672.296.864.192.2.48.296.864.296l-.096.128zm6.392.936c-.216 0-.36-.04-.44-.12-.08-.072-.152-.232-.208-.44l-2.32-7.632a1.97 1.97 0 0 1-.088-.464c0-.184.092-.288.272-.288h.784c.228 0 .38.04.456.12.084.072.148.232.204.44l1.66 6.54 1.54-6.54c.048-.216.112-.368.196-.44.084-.072.244-.12.464-.12h.64c.228 0 .384.04.464.12.08.072.152.224.196.44l1.56 6.62 1.712-6.62c.056-.216.124-.368.204-.44.084-.072.236-.12.456-.12h.744c.18 0 .28.096.28.288 0 .056-.008.12-.024.192a1.86 1.86 0 0 1-.064.28l-2.384 7.632c-.056.216-.128.368-.208.44-.08.072-.232.12-.44.12h-.688c-.228 0-.38-.04-.464-.12-.08-.08-.148-.232-.192-.448L14.74 5.68l-1.532 6.36c-.048.224-.112.376-.192.448-.08.08-.24.12-.464.12h-.688z"/><path fill="#FF9900" d="M21.384 13.248c-2.16 1.596-5.292 2.444-7.992 2.444-3.78 0-7.188-1.4-9.768-3.724-.204-.184-.024-.436.22-.292 2.784 1.62 6.228 2.596 9.78 2.596 2.4 0 5.04-.496 7.464-1.528.364-.164.672.24.296.504z"/><path fill="#FF9900" d="M22.232 12.252c-.276-.356-1.828-.168-2.528-.084-.212.024-.244-.16-.052-.296 1.236-.868 3.264-.616 3.5-.328.24.296-.064 2.332-1.224 3.308-.18.148-.348.068-.268-.128.26-.648.848-2.108.572-2.472z"/></svg>
-                <span>AWS</span>
-              </div>
-            </label>
-            <label class="provider-card" data-provider="GCP">
-              <input type="radio" name="cloud_provider_radio" value="GCP" required />
-              <div class="provider-card-inner">
-                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4285F4" d="M12.65 4.05h4.78l-1.57 1.57-.58 2.66h2.21l-3.61 5.48h1.56l-5.13 6.19 1.96-4.62H10.3l2.35-5.84h-2.2z"/><path fill="#34A853" d="M7.33 12.64l-1.57 1.57-.58 2.66h2.21L3.78 22.35h1.56L.21 28.54l1.96-4.62H.2l2.35-5.84h-2.2l2.43-6.01h4.78" opacity="0"/><path fill="#4285F4" d="M14.2 2.5L12 4.7l.65-.65h-1.3A7.5 7.5 0 0 0 4.7 12l-2.2 2.2A9.99 9.99 0 0 1 12 2z"/><path fill="#FBBC05" d="M22 12c0 1.77-.46 3.43-1.27 4.88l-2.2-2.2A7.49 7.49 0 0 0 19.5 12c0-.97-.18-1.9-.52-2.75l2.2-2.2C21.85 8.74 22 10 22 12z" opacity="0.9"/><circle cx="12" cy="12" r="3.5" fill="#4285F4"/><path fill="#34A853" d="M12 22a9.96 9.96 0 0 1-7.73-3.65l2.2-2.2A7.48 7.48 0 0 0 12 19.5c1.4 0 2.7-.38 3.82-1.05l2.2 2.2A9.96 9.96 0 0 1 12 22z" opacity="0.9"/><path fill="#EA4335" d="M5.25 7.05A7.47 7.47 0 0 0 4.5 12c0 1.28.32 2.49.88 3.55l-2.2 2.2A9.95 9.95 0 0 1 2 12c0-2.15.68-4.14 1.83-5.77l2.2 2.2C5.7 8.08 5.44 8 5.25 7.05z" opacity="0.9"/></svg>
-                <span>GCP</span>
-              </div>
-            </label>
-          </div>
-          <select id="cloud_provider" class="hidden" required>
-            <option value="">Select provider...</option>
-            <option value="GCP">GCP</option>
-            <option value="AWS">AWS</option>
-          </select>
-        </div>
+        <!-- Hidden Provider Field -->
+        <input type="hidden" id="cloud_provider" name="cloud_provider" />
 
         <div class="form-row">
           <div class="form-group">
@@ -167,10 +493,13 @@
 
         <div class="form-group">
           <label for="justification">Business Justification</label>
-          <textarea id="justification" rows="3" placeholder="Describe why you need this bucket..."></textarea>
+          <textarea id="justification" rows="5" placeholder="Describe why you need this bucket..."></textarea>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+          <button type="button" id="back-to-provider" class="btn btn-outline stylish-back-btn">
+            ← Back to Provider Selection
+          </button>
           <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Submit Request
@@ -184,29 +513,7 @@
       <div id="status-message"></div>
     </div>
 
-    <!-- Recent Requests -->
-    <div id="requests-section" class="card hidden">
-      <div class="card-title-row">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <h2>Recent Requests</h2>
-      </div>
-      <div style="margin-bottom:10px;">
-        <input type="number" id="search-ticket-input" placeholder="Enter ticket number..." style="padding:6px 12px; border-radius:6px; border:1px solid #e2e5ed; width:180px; margin-right:8px;" />
-        <button id="search-ticket-btn" class="btn btn-outline btn-sm">🔍 Open Ticket</button>
-        <button id="refresh-requests-btn" class="btn btn-outline btn-sm" style="margin-left:8px;">🔄 Refresh Requests</button>
-      </div>
-      <div id="requests-list"></div>
-    </div>
-
-    <!-- Request Detail Modal -->
-    <div id="request-modal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close-modal" id="close-modal">&times;</span>
-        <div id="modal-body">
-          <!-- Populated dynamically -->
-        </div>
-      </div>
-    </div>
+    <!-- (Duplicate requests section removed — Recent Requests are shown inside the Service Request card) -->
 
     <footer>
       <div class="footer-content">
@@ -219,7 +526,68 @@
     </footer>
   </div>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=20260313a"></script>
+  <script src="app.js?v=20260314a"></script>
+  <script>
+  // ---- Floating particles ----
+  (function(){
+    const canvas = document.createElement('canvas');
+    canvas.id = 'particle-canvas';
+    document.body.insertBefore(canvas, document.body.firstChild);
+    const ctx = canvas.getContext('2d');
+    let W, H, particles;
+    const COUNT = 72;
+    const COLORS = [
+      '139,92,246','6,182,212','244,114,182','52,211,153','251,191,36','248,113,113'
+    ];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function make() {
+      return {
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2.8 + 0.8,
+        dx: (Math.random() - 0.5) * 0.35,
+        dy: (Math.random() - 0.5) * 0.35,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        alpha: Math.random() * 0.5 + 0.15,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: Math.random() * 0.018 + 0.008
+      };
+    }
+
+    function init() {
+      resize();
+      particles = Array.from({length: COUNT}, make);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        p.pulse += p.pulseSpeed;
+        const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.color},${a.toFixed(2)})`;
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < -10) p.x = W + 10;
+        if (p.x > W + 10) p.x = -10;
+        if (p.y < -10) p.y = H + 10;
+        if (p.y > H + 10) p.y = -10;
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); });
+    init();
+    draw();
+  })();
+  </script>
 </body>
 </html>
