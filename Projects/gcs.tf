@@ -193,3 +193,16 @@ resource "google_storage_bucket" "labweek_demo7" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "labweek_demo8" {
+  name     = "labweek-demo8"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
