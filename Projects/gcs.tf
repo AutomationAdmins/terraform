@@ -180,3 +180,16 @@ resource "google_storage_bucket" "labweek_demo3" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "labweek_demo4" {
+  name     = "labweek-demo4"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
