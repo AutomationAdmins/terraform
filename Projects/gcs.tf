@@ -219,3 +219,16 @@ resource "google_storage_bucket" "my_demo_bucket_786" {
     owner = "selfservice"
   }
 }
+
+resource "google_storage_bucket" "first_dev_bucket_demo" {
+  name     = "first-dev-bucket-demo"
+  location = "asia-south1"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  labels = {
+    env   = "dev"
+    owner = "selfservice"
+  }
+}
